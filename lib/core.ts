@@ -7,3 +7,9 @@ export { EventsHandler } from './core/events-handler.ts';
 export { Component } from './core/component.ts';
 export { Modal } from './core/modal.ts';
 export * as utils from './core/utils.ts';
+
+/** Hooks */
+export { useChild } from './core/hooks/use-child.ts';
+export { useChildren } from './core/hooks/use-children.ts';
+export { useComponent } from './core/hooks/use-component.ts';
+export { useComponents } from './core/hooks/use-components.ts';

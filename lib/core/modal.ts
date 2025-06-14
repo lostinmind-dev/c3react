@@ -1,13 +1,10 @@
+import type { UseProps } from "./component.ts";
 import { app } from "./app.ts";
 import { EventsHandler } from "./events-handler.ts";
 
-export abstract class Modal<
-    Events extends Record<string, any> = Record<string, any>,
-    ShowProps extends object = object,
-    HideProps extends object = object,
-> extends EventsHandler<{
+export abstract class Modal<ShowProps = any, HideProps = any> extends EventsHandler<{
     'reset': void;
-} & Events> {
+}> {
     private static readonly modals = new Set<Modal<any>>();
 
     static init() {
@@ -24,7 +21,7 @@ export abstract class Modal<
 
     protected readonly container!: InstanceType.container;
 
-    private readonly layerName: string;
+    protected readonly layerName: string;
     private readonly layersToDisable: string[];
 
     constructor(
@@ -33,8 +30,6 @@ export abstract class Modal<
             layerName?: string,
             layersToDisable?: string[],
         },
-        readonly showProps?: ShowProps,
-        readonly hideProps?: HideProps,
     ) {
         super();
         this.layerName = opts?.layerName || this.templateName;
@@ -54,7 +49,7 @@ export abstract class Modal<
 
         if (!layer) {
             const topIndex = runtime.layout.getAllLayers().reduce((max, l) => l.index > max ? l.index : max, -Infinity);
-            
+
             runtime.layout.addLayer(
                 this.layerName,
                 runtime.layout.getLayer(topIndex),
@@ -116,18 +111,24 @@ export abstract class Modal<
     public async show(props?: ShowProps) {
         this.#isShowing = true;
         this.defineContainer();
-        await this.onShow(props);
+
+        if (props) return await this.onShow(props);
+
+        await this.onShow(null);
     }
 
     public async hide(props?: HideProps) {
-        await this.onHide(props);
+        if (props) return await this.onHide(props);
+
+        await this.onHide(null);
+        
         this.#isShowing = false;
     }
 
     /** If it was created firstly */
     protected abstract onReady(): void | Promise<void>;
-    protected abstract onShow(props?: ShowProps): void | Promise<void>;
-    protected abstract onHide(props?: HideProps): void | Promise<void>;
+    protected abstract onShow(props: ShowProps | null): void | Promise<void>;
+    protected abstract onHide(props: HideProps | null): void | Promise<void>;
 }
 
 Modal.init();

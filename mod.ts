@@ -5,6 +5,11 @@ export {
     EventsHandler,
     Component,
     Modal,
-    utils
+    utils,
+
+    useChild,
+    useChildren,
+    useComponent,
+    useComponents,
 } from './lib/core.ts';
 export default app; 

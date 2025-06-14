@@ -9,9 +9,7 @@ export class MainLayout extends Layout {
     protected override onStart = () => {
         let count = 0;
         setInterval(() => {
-            this.ui.box.update({
-                text: `te ${count}`
-            });
+            this.ui.box.update();
 
             count++;
         }, 1000);

@@ -1,21 +1,22 @@
-import { Component } from 'c3react';
+import { 
+    Component,
+    useChild
+} from 'c3react';
 
 export default class Box extends Component<{
-    /** Declare component events */
-}, {
-    /** Declare component props */
     text: string;
 }> {
-    private readonly useText = this.useChild('text');
+    private readonly useText = useChild(this, 'text');
 
     protected onReady() {
         /** Triggered once when ready */
     }
 
-    update(props: NonNullable<this['props']>) {
+    update() {
+        const props = this.useProps();
         const text = this.useText();
 
-        text.x = 0;
+        this.useText().x = 0;
         text.typewriterText(props.text, 0.25);
     }
 }
