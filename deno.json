@@ -1,0 +1,22 @@
+{
+    "name": "@lostinmind/c3react",
+    "compilerOptions": {
+        "lib": [
+            "deno.ns",
+            "dom",
+            "dom.asynciterable",
+            "dom.iterable"
+        ]
+    },
+    "tasks": {
+        "install:cli": "deno install -f -A -g -n c3react ./lib/cli.ts",
+        "bundle:tsdefs": {
+            "command": "deno run -A utils/bundle-tsdefs.ts",
+            "description": "Bundles C3 declaration files into one 'c3.d.ts' file"
+        }
+    },
+    "exports": {
+        ".": "./lib/core.ts",
+        "./cli": "./lib/cli.ts"
+    }
+}
