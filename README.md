@@ -53,10 +53,14 @@ _layouts/main.layout.ts_
 
 ```typescript
 import { Layout } from "c3react";
-import { MainUI } from "./main.ui.ts";
+import Box from "@/components/box.ts";
+
+function getInitialText() {
+  return { initialText: "Count 0" };
+}
 
 export class MainLayout extends Layout {
-  private readonly ui = new MainUI();
+  readonly box = new Box("box", getInitialText);
 
   constructor() {
     super("main");
@@ -66,17 +70,15 @@ export class MainLayout extends Layout {
     let count = 0;
 
     setInterval(() => {
-      this.ui.box.update({
-        text: `Count: ${count}`,
-      });
-
+      this.box.text = `Count ${count}`;
+      this.box.update();
       count++;
     }, 1000);
   };
 }
 ```
 
-_layouts/main.ui.ts_
+_components/box.ts_
 
 ```typescript
 import Box from "@/components/box.ts";
@@ -89,25 +91,29 @@ export class MainUI {
 ```
 
 ```typescript
-import { Component } from "c3react";
+import { 
+    Component,
+    useChild
+} from 'c3react';
 
 export default class Box extends Component<{
-  /** Declare component events */
-}, {
-  /** Declare component props */
-  text: string;
+    initialText: string;
 }> {
-  private readonly useText = this.useChild("text");
+    private readonly useText = useChild(() => this.container, 'text');
 
-  protected onReady() {
-    /** Triggered once when ready */
-  }
+    public text: string = ''
 
-  update(props: NonNullable<this["props"]>) {
-    const text = this.useText();
+    protected onReady() {
+        /** Triggered once when ready */
+        const { initialText } = this.useProps();
+        this.useText().text = initialText;
+    }
 
-    text.x = 0;
-    text.typewriterText(props.text, 0.25);
-  }
+    update() {
+        const text = this.useText();
+        this.useText().x = 0;
+        text.typewriterText(this.text, 0.25);
+    }
 }
+
 ```

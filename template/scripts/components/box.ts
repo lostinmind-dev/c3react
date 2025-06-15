@@ -4,19 +4,21 @@ import {
 } from 'c3react';
 
 export default class Box extends Component<{
-    text: string;
+    initialText: string;
 }> {
-    private readonly useText = useChild(this, 'text');
+    private readonly useText = useChild(() => this.container, 'text');
+
+    public text: string = ''
 
     protected onReady() {
         /** Triggered once when ready */
+        const { initialText } = this.useProps();
+        this.useText().text = initialText;
     }
 
     update() {
-        const props = this.useProps();
         const text = this.useText();
-
         this.useText().x = 0;
-        text.typewriterText(props.text, 0.25);
+        text.typewriterText(this.text, 0.25);
     }
 }

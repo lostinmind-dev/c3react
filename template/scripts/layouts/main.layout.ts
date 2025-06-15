@@ -1,16 +1,21 @@
 import { Layout } from 'c3react';
-import { MainUI } from "./main.ui.ts";
+import Box from '@/components/box.ts';
+
+function getInitialText() {
+    return { initialText: 'Count 0' };
+}
 
 export class MainLayout extends Layout {
-    private readonly ui = new MainUI();
+    readonly box = new Box('box', getInitialText);
 
     constructor() { super('main') }
 
     protected override onStart = () => {
         let count = 0;
-        setInterval(() => {
-            this.ui.box.update();
 
+        setInterval(() => {
+            this.box.text = `Count ${count}`;
+            this.box.update();
             count++;
         }, 1000);
     }
