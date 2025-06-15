@@ -1,6 +1,6 @@
 <div align="center">
 
-<iframe src="https://lottie.host/5573f807-ec89-4552-9454-8473e48cc4ff/OlvoTo8Eeh.lottie" width="300" height="300"></iframe>
+<img src="./c3react.gif" width="150" height="150"></img>
 
 <h1>
     C3React
