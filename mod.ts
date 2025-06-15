@@ -11,5 +11,7 @@ export {
     useChildren,
     useComponent,
     useComponents,
+    useObject,
+    useObjects,
 } from './lib/core.ts';
 export default app; 

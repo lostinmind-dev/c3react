@@ -13,3 +13,5 @@ export { useChild } from './core/hooks/use-child.ts';
 export { useChildren } from './core/hooks/use-children.ts';
 export { useComponent } from './core/hooks/use-component.ts';
 export { useComponents } from './core/hooks/use-components.ts';
+export { useObject } from './core/hooks/use-object.ts';
+export { useObjects } from './core/hooks/use-objects.ts';

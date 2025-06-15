@@ -22,6 +22,7 @@ export type ComponentConstructor<T extends Component = Component> = new (...args
 export abstract class Component<Props = any> extends EventsHandler<{
     'touch-start': void,
     'touch-end': void,
+    'reset': void,
 }> {
     private static isInited: boolean = false;
     private static readonly cache = new Set<Component>();
@@ -86,6 +87,7 @@ export abstract class Component<Props = any> extends EventsHandler<{
         }
 
     #reset() {
+        this.emit('reset');
         this.release();
     }
 

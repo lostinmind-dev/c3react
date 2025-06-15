@@ -4,7 +4,7 @@ export function useChildren<
     ObjectName extends keyof IConstructProjectObjects,
     ChildInstType = NonNullable<ReturnType<IConstructProjectObjects[ObjectName]['getFirstInstance']>>
 >(
-    container: InstanceType.container,
+    container: () => InstanceType.container,
     objectName: ObjectName,
     type: 'own' | 'all' = 'all',
     condition?: UseCondition<ChildInstType>
@@ -13,9 +13,9 @@ export function useChildren<
 
     return () => {
         if (type === 'all') {
-            children = container.allChildren().filter(i => i.objectType.name === objectName);
+            children = container().allChildren().filter(i => i.objectType.name === objectName);
         } else {
-            children = container.children().filter(i => i.objectType.name === objectName);
+            children = container().children().filter(i => i.objectType.name === objectName);
         }
 
         if (condition) {

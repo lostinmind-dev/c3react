@@ -65,6 +65,15 @@ export abstract class Modal<ShowProps = any, HideProps = any> extends EventsHand
     }
 
     private defineContainer() {
+        if (!this.container) {
+            const container = runtime.objects.container.instances().find(i => i.templateName === this.templateName);
+            if (container) {
+                //@ts-ignore;
+                this.container = container;
+                this.onReady();
+            }
+        }
+
         if (this.container) return;
 
         const layer = this.getOrCreateLayer();
@@ -118,6 +127,8 @@ export abstract class Modal<ShowProps = any, HideProps = any> extends EventsHand
     }
 
     public async hide(props?: HideProps) {
+        this.defineContainer();
+        
         if (props) return await this.onHide(props);
 
         await this.onHide(null);
