@@ -81,16 +81,6 @@ export class MainLayout extends Layout {
 _components/box.ts_
 
 ```typescript
-import Box from "@/components/box.ts";
-
-export class MainUI {
-  readonly box = new Box("#root", {
-    text: "{initial_value}",
-  });
-}
-```
-
-```typescript
 import { Component, useChild } from "c3react";
 
 export default class Box extends Component<{
