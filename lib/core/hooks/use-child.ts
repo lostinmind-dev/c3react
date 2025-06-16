@@ -1,36 +1,46 @@
-import type { UseCondition } from "./index.ts";
+import type { ExtractObjectInstType } from '../component-v2.ts';
 
+/**
+ * Searching child in instance by proving "objectName" and optional "condition" parameters
+ * @param instance Instance or callback with instance that will be used for searching child for
+ * @param objectName Object name of child
+ * @param condition *Optional* condition for searching
+ * @returns
+ */
 export function useChild<
-    ObjectName extends keyof IConstructProjectObjects,
-    ChildInstType = NonNullable<ReturnType<IConstructProjectObjects[ObjectName]['getFirstInstance']>>
+    N extends keyof IConstructProjectObjects,
+    I = ExtractObjectInstType<N>,
 >(
-    container: () => InstanceType.container,
-    objectName: ObjectName,
-    condition?: UseCondition<ChildInstType>,
-    type: 'own' | 'all' = 'all',
+    instance: IWorldInstance | (() => IWorldInstance),
+    objectName: N,
+    condition?: (inst: I) => boolean,
 ) {
-    let children: IteratorObject<IWorldInstance, undefined, unknown>;
-    
+    let children: I[];
+    let child: I | undefined;
+
     return () => {
-        if (type === 'all') {
-            children = container().allChildren().filter(i => i.objectType.name === objectName);
+        if (typeof instance === 'function') {
+            children = instance().allChildren().filter((i) =>
+                i.objectType.name === objectName
+            ).toArray() as I[];
         } else {
-            children = container().children().filter(i => i.objectType.name === objectName);
+            children = instance.allChildren().filter((i) =>
+                i.objectType.name === objectName
+            ).toArray() as I[];
         }
 
         if (condition) {
-            const child = children.toArray().find(i => condition(i as ChildInstType));
+            child = children.find((i) => condition(i));
 
-            if (child) return child as ChildInstType;
+            if (!child) throw new Error('Child NOT found by condition');
 
-            console.log(`Child not found by condition [OBJECT_NAME: ${objectName}]`, condition)
-            throw new Error(`Child not found by condition [OBJECT_NAME: ${objectName}]`);
+            return child;
         }
 
-        const child = children.find(i => i.objectType.name === objectName);
+        if (children.length === 0) throw new Error('0 children was found');
 
-        if (!child) throw new Error('Child not found');
+        child = children[0];
 
-        return child as ChildInstType;
-    }
+        return child;
+    };
 }

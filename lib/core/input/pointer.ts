@@ -34,7 +34,7 @@ export class PointerSystem {
 
         return () => {
             this.#downHandlers.delete(handler);
-        }
+        };
     }
 
     onMove(handler: C3React.Pointer.Handler) {
@@ -42,7 +42,7 @@ export class PointerSystem {
 
         return () => {
             this.#moveHandlers.delete(handler);
-        }
+        };
     }
 
     onUp(handler: C3React.Pointer.Handler) {
@@ -50,7 +50,7 @@ export class PointerSystem {
 
         return () => {
             this.#upHandlers.delete(handler);
-        }
+        };
     }
 
     onCancel(handler: C3React.Pointer.Handler) {
@@ -58,7 +58,7 @@ export class PointerSystem {
 
         return () => {
             this.#cancelHandlers.delete(handler);
-        }
+        };
     }
 
     #onDown(e: ConstructPointerEvent) {

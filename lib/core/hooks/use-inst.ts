@@ -1,0 +1,30 @@
+import type { ExtractObjectInstType } from '../component-v2.ts';
+
+export function useInst<N extends keyof IConstructProjectObjects>(
+    objectName: N,
+    condition?: (inst: ExtractObjectInstType<N>) => boolean,
+) {
+    let instance: ExtractObjectInstType<N> | undefined;
+
+    return () => {
+        const object = runtime.objects[objectName];
+
+        if (condition) {
+            instance = object.instances().find((i) => condition(i));
+
+            if (!instance) {
+                throw new Error(
+                    `Instance [${objectName}] not found by condition`,
+                );
+            }
+
+            return instance as ExtractObjectInstType<N>;
+        }
+
+        instance = object.getFirstInstance() || undefined;
+
+        if (!instance) throw new Error(`No any instance was found`);
+
+        return instance;
+    };
+}

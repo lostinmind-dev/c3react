@@ -9,10 +9,22 @@ export const BUTTONS = {
 
 export class MouseSystem {
     readonly #moveHandlers = new Set<C3React.Mouse.Handler>();
-    readonly #clickListeners = new Map<number | 'any', Set<C3React.Mouse.Handler>>();
-    readonly #dblClickListeners = new Map<number | 'any', Set<C3React.Mouse.Handler>>();
-    readonly #releaseListeneres = new Map<number | 'any', Set<C3React.Mouse.Handler>>();
-    readonly #wheelListeners = new Map<C3React.Mouse.WheelDirection, Set<C3React.Mouse.Handler>>();
+    readonly #clickListeners = new Map<
+        number | 'any',
+        Set<C3React.Mouse.Handler>
+    >();
+    readonly #dblClickListeners = new Map<
+        number | 'any',
+        Set<C3React.Mouse.Handler>
+    >();
+    readonly #releaseListeneres = new Map<
+        number | 'any',
+        Set<C3React.Mouse.Handler>
+    >();
+    readonly #wheelListeners = new Map<
+        C3React.Mouse.WheelDirection,
+        Set<C3React.Mouse.Handler>
+    >();
 
     readonly #buttons = new Map<number, C3React.Mouse.ButtonState>();
     #previousButtons = new Map<number, C3React.Mouse.ButtonState>();
@@ -36,10 +48,13 @@ export class MouseSystem {
 
         return () => {
             this.#moveHandlers.delete(handler);
-        }
+        };
     }
 
-    onButtonClicked(button: keyof typeof BUTTONS | 'any', handler: C3React.Mouse.Handler) {
+    onButtonClicked(
+        button: keyof typeof BUTTONS | 'any',
+        handler: C3React.Mouse.Handler,
+    ) {
         const key = (button === 'any') ? 'any' : BUTTONS[button];
 
         let handlers = this.#clickListeners.get(key);
@@ -53,10 +68,13 @@ export class MouseSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
-    onButtonReleased(button: keyof typeof BUTTONS | 'any', handler: C3React.Mouse.Handler) {
+    onButtonReleased(
+        button: keyof typeof BUTTONS | 'any',
+        handler: C3React.Mouse.Handler,
+    ) {
         const key = (button === 'any') ? 'any' : BUTTONS[button];
 
         let handlers = this.#releaseListeneres.get(key);
@@ -70,10 +88,13 @@ export class MouseSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
-    onMouseWheel(direction: C3React.Mouse.WheelDirection, handler: C3React.Mouse.Handler) {
+    onMouseWheel(
+        direction: C3React.Mouse.WheelDirection,
+        handler: C3React.Mouse.Handler,
+    ) {
         let handlers = this.#wheelListeners.get(direction);
 
         if (!handlers) {
@@ -85,10 +106,13 @@ export class MouseSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
-    onDoubleClicked(button: keyof typeof BUTTONS | 'any', handler: C3React.Mouse.Handler) {
+    onDoubleClicked(
+        button: keyof typeof BUTTONS | 'any',
+        handler: C3React.Mouse.Handler,
+    ) {
         const key = (button === 'any') ? 'any' : BUTTONS[button];
 
         let handlers = this.#dblClickListeners.get(key);
@@ -102,7 +126,7 @@ export class MouseSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
     isButtonPressed(button: keyof typeof BUTTONS) {
@@ -110,13 +134,15 @@ export class MouseSystem {
     }
 
     isButtonReleased(button: keyof typeof BUTTONS) {
-        return this.#buttons.get(BUTTONS[button]) === 'up'
+        return this.#buttons.get(BUTTONS[button]) === 'up';
     }
 
     #onWheel(e: WheelEvent) {
-        const direction: C3React.Mouse.WheelDirection = (e.deltaY > 0) ? 'down' : 'up';
+        const direction: C3React.Mouse.WheelDirection = (e.deltaY > 0)
+            ? 'down'
+            : 'up';
 
-        const handlers = this.#wheelListeners.get(direction)
+        const handlers = this.#wheelListeners.get(direction);
 
         if (!handlers) return;
 
@@ -133,7 +159,6 @@ export class MouseSystem {
 
         if (previousState !== 'down') {
             this.#buttons.set(e.button, 'down');
-
 
             const handlers = this.#clickListeners.get(e.button);
 
@@ -171,7 +196,7 @@ export class MouseSystem {
 
         this.#buttons.set(e.button, 'up');
 
-        const handlers = this.#releaseListeneres.get(e.button)
+        const handlers = this.#releaseListeneres.get(e.button);
 
         if (handlers) {
             for (const handler of handlers) {
@@ -202,7 +227,9 @@ export class MouseSystem {
         this.#previousButtons = new Map(this.#buttons);
 
         this.#buttons.forEach((state, button) => {
-            if (state === 'down' && this.#previousButtons.get(button) === 'down') {
+            if (
+                state === 'down' && this.#previousButtons.get(button) === 'down'
+            ) {
                 this.#buttons.set(button, 'pressed');
             }
         });

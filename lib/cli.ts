@@ -1,4 +1,3 @@
-
 import { parseArgs } from 'jsr:@std/cli/parse-args';
 
 /** Commands */
@@ -20,7 +19,7 @@ async function main() {
         return await build(true);
     }
 
-    console.log(args)
+    console.log(args);
 }
 
 await main();

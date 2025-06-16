@@ -5,7 +5,10 @@ export class EventsHandler<
 > {
     private readonly events = new Map<keyof Events, Set<Handler>>();
 
-    on<Event extends keyof Events>(event: Event, handler: Handler<Events[Event]>) {
+    on<Event extends keyof Events>(
+        event: Event,
+        handler: Handler<Events[Event]>,
+    ) {
         let handlers = this.events.get(event);
 
         if (!handlers) {
@@ -16,7 +19,10 @@ export class EventsHandler<
         handlers.add(handler);
     }
 
-    protected emit<Event extends keyof Events>(event: Event, ...data: Events[Event] extends void ? [] : [Events[Event]]) {
+    protected emit<Event extends keyof Events>(
+        event: Event,
+        ...data: Events[Event] extends void ? [] : [Events[Event]]
+    ) {
         const handlers = this.events.get(event);
 
         if (!handlers) return;

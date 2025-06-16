@@ -3,31 +3,29 @@ import { KeyboardSystem } from './input/keyboard.ts';
 import { MouseSystem } from './input/mouse.ts';
 import { PointerSystem } from './input/pointer.ts';
 
-type Type<T> = new (...args: any[]) => T;
-
-type InitOptions<T> = Readonly<{
-    layouts: Array<any>;
+type InitOptions = Readonly<{
+    layouts: Layout[];
     beforeStart: () => void | Promise<void>;
 }>;
 
 type EventHandler<Data = any> = (data: Data) => void;
 
 export abstract class app {
-    private static readonly events = new Map<keyof RuntimeEventMap, Set<EventHandler>>();
+    private static readonly events = new Map<
+        keyof RuntimeEventMap,
+        Set<EventHandler>
+    >();
     private static isInited: boolean = false;
 
     private static globalize(runtime: IRuntime) {
         //@ts-ignore @GLOBAL
         globalThis.runtime = runtime;
         //@ts-ignore @GLOBAL
-        globalThis.keyboard = 
-        new KeyboardSystem(runtime);
+        globalThis.keyboard = new KeyboardSystem(runtime);
         //@ts-ignore @GLOBAL
-        globalThis.mouse = 
-        new MouseSystem(runtime);
+        globalThis.mouse = new MouseSystem(runtime);
         //@ts-ignore @GLOBAL
-        globalThis.pointer = 
-        new PointerSystem(runtime);
+        globalThis.pointer = new PointerSystem(runtime);
     }
 
     static async addScript(url: string) {
@@ -42,23 +40,28 @@ export abstract class app {
         });
     }
 
-    static init(opts: InitOptions<Layout>) {
+    static init(opts: InitOptions) {
         if (this.isInited) return;
-        
+
         runOnStartup(async (runtime) => {
             this.isInited = true;
 
             this.globalize(runtime);
 
             for (const [event, handlers] of this.events) {
-                handlers.forEach(handler => runtime.addEventListener(event, handler));
+                handlers.forEach((handler) =>
+                    runtime.addEventListener(event, handler)
+                );
             }
 
             await opts.beforeStart?.();
-        })
+        });
     }
 
-    static on<Event extends keyof RuntimeEventMap>(event: Event, handler: EventHandler<RuntimeEventMap[Event]>) {
+    static on<Event extends keyof RuntimeEventMap>(
+        event: Event,
+        handler: EventHandler<RuntimeEventMap[Event]>,
+    ) {
         let handlers = this.events.get(event);
 
         if (!handlers) {
@@ -79,3 +82,9 @@ export abstract class app {
         this.events.clear();
     }
 }
+
+app.on('afteranylayoutend', () => {
+    keyboard.release();
+    pointer.release();
+    mouse.release();
+});

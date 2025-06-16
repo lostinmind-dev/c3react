@@ -18,5 +18,9 @@
     "exports": {
         ".": "./lib/core.ts",
         "./cli": "./lib/cli.ts"
+    },
+    "fmt": {
+        "singleQuote": true,
+        "indentWidth": 4
     }
 }

@@ -1,31 +1,31 @@
 {
-	"name": "container",
-	"plugin-id": "TiledBg",
-	"sid": 205853786921354,
-	"isGlobal": false,
-	"editorNewInstanceIsReplica": true,
-	"instanceVariables": [
-		{
-			"name": "id",
-			"type": "string",
-			"desc": "",
-			"show": true,
-			"sid": 126079213072958
-		}
-	],
-	"behaviorTypes": [],
-	"effectTypes": [],
-	"image": {
-		"width": 2,
-		"height": 2,
-		"originX": 0.5,
-		"originY": 0.5,
-		"originalSource": "",
-		"exportFormat": "lossless",
-		"exportQuality": 0.8,
-		"fileType": "image/png",
-		"imageSpriteId": 5622211,
-		"useCollisionPoly": true,
-		"tag": ""
-	}
+    "name": "container",
+    "plugin-id": "TiledBg",
+    "sid": 205853786921354,
+    "isGlobal": false,
+    "editorNewInstanceIsReplica": true,
+    "instanceVariables": [
+        {
+            "name": "id",
+            "type": "string",
+            "desc": "",
+            "show": true,
+            "sid": 126079213072958
+        }
+    ],
+    "behaviorTypes": [],
+    "effectTypes": [],
+    "image": {
+        "width": 2,
+        "height": 2,
+        "originX": 0.5,
+        "originY": 0.5,
+        "originalSource": "",
+        "exportFormat": "lossless",
+        "exportQuality": 0.8,
+        "fileType": "image/png",
+        "imageSpriteId": 5622211,
+        "useCollisionPoly": true,
+        "tag": ""
+    }
 }

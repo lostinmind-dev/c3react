@@ -8,7 +8,9 @@ function getInitialText() {
 export class MainLayout extends Layout {
     readonly box = new Box('box', getInitialText);
 
-    constructor() { super('main') }
+    constructor() {
+        super('main');
+    }
 
     protected override onStart = () => {
         let count = 0;
@@ -18,5 +20,5 @@ export class MainLayout extends Layout {
             this.box.update();
             count++;
         }, 1000);
-    }
+    };
 }

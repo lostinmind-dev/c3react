@@ -8,20 +8,19 @@ type HideProps = {};
 
 class BoxModal extends Modal<ShowProps, HideProps> {
     protected override onReady() {
-        console.log('Modal ready!', this.container)
+        console.log('Modal ready!', this.container);
     }
 
     protected override onShow(props: ShowProps | null) {
-        this.container.setPosition(250, 250)
+        this.container.setPosition(250, 250);
     }
 
     protected override onHide(props: ShowProps | null) {
-        this.container.setPosition(-1000, -1000)
+        this.container.setPosition(-1000, -1000);
     }
-
 }
 
 const modal = new BoxModal('box', {
-    layersToDisable: []
+    layersToDisable: [],
 });
 export default modal;

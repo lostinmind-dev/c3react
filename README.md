@@ -32,18 +32,18 @@ scripting
 _main.ts_
 
 ```typescript
-import app from "c3react";
-import { MainLayout } from "@/layouts/main.layout.ts";
+import app from 'c3react';
+import { MainLayout } from '@/layouts/main.layout.ts';
 
 app.init({
-  layouts: [
-    /** Initialize layouts here... */
-    new MainLayout(),
-  ],
-  beforeStart: async () => {
-    /** Load packages or modules here... */
-    // app.addScript('https://cdn.com/index.js');
-  },
+    layouts: [
+        /** Initialize layouts here... */
+        new MainLayout(),
+    ],
+    beforeStart: async () => {
+        /** Load packages or modules here... */
+        // app.addScript('https://cdn.com/index.js');
+    },
 });
 ```
 
@@ -52,54 +52,54 @@ app.init({
 _layouts/main.layout.ts_
 
 ```typescript
-import { Layout } from "c3react";
-import Box from "@/components/box.ts";
+import { Layout } from 'c3react';
+import Box from '@/components/box.ts';
 
 function getInitialText() {
-  return { initialText: "Count 0" };
+    return { initialText: 'Count 0' };
 }
 
 export class MainLayout extends Layout {
-  readonly box = new Box("box", getInitialText);
+    readonly box = new Box('box', getInitialText);
 
-  constructor() {
-    super("main");
-  }
+    constructor() {
+        super('main');
+    }
 
-  protected override onStart = () => {
-    let count = 0;
+    protected override onStart = () => {
+        let count = 0;
 
-    setInterval(() => {
-      this.box.text = `Count ${count}`;
-      this.box.update();
-      count++;
-    }, 1000);
-  };
+        setInterval(() => {
+            this.box.text = `Count ${count}`;
+            this.box.update();
+            count++;
+        }, 1000);
+    };
 }
 ```
 
 _components/box.ts_
 
 ```typescript
-import { Component, useChild } from "c3react";
+import { Component, useChild } from 'c3react';
 
 export default class Box extends Component<{
-  initialText: string;
+    initialText: string;
 }> {
-  private readonly useText = useChild(() => this.container, "text");
+    private readonly useText = useChild(() => this.container, 'text');
 
-  public text: string = "";
+    public text: string = '';
 
-  protected onReady() {
-    /** Triggered once when ready */
-    const { initialText } = this.useProps();
-    this.useText().text = initialText;
-  }
+    protected onReady() {
+        /** Triggered once when ready */
+        const { initialText } = this.useProps();
+        this.useText().text = initialText;
+    }
 
-  update() {
-    const text = this.useText();
-    this.useText().x = 0;
-    text.typewriterText(this.text, 0.25);
-  }
+    update() {
+        const text = this.useText();
+        this.useText().x = 0;
+        text.typewriterText(this.text, 0.25);
+    }
 }
 ```

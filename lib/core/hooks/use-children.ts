@@ -1,29 +1,32 @@
-import type { UseCondition } from "./index.ts";
+import type { ExtractObjectInstType } from '../component-v2.ts';
 
 export function useChildren<
-    ObjectName extends keyof IConstructProjectObjects,
-    ChildInstType = NonNullable<ReturnType<IConstructProjectObjects[ObjectName]['getFirstInstance']>>
+    N extends keyof IConstructProjectObjects,
+    I = ExtractObjectInstType<N>,
 >(
-    container: () => InstanceType.container,
-    objectName: ObjectName,
-    type: 'own' | 'all' = 'all',
-    condition?: UseCondition<ChildInstType>
+    instance: IWorldInstance | (() => IWorldInstance),
+    objectName: N,
+    condition?: (inst: I) => boolean,
 ) {
-    let children: IteratorObject<IWorldInstance, undefined, unknown>;
+    let children: I[] = [];
 
     return () => {
-        if (type === 'all') {
-            children = container().allChildren().filter(i => i.objectType.name === objectName);
+        if (typeof instance === 'function') {
+            children = instance().allChildren().filter((i) =>
+                i.objectType.name === objectName
+            ).toArray() as I[];
         } else {
-            children = container().children().filter(i => i.objectType.name === objectName);
+            children = instance.allChildren().filter((i) =>
+                i.objectType.name === objectName
+            ).toArray() as I[];
         }
 
         if (condition) {
-            const filtered = children.filter(i => condition(i as ChildInstType));
+            children = children.filter((i) => condition(i));
 
-            return filtered.toArray() as ChildInstType[];
+            return children;
         }
 
-        return children.toArray() as ChildInstType[];
-    }
+        return children;
+    };
 }

@@ -1,14 +1,11 @@
-import { 
-    Component,
-    useChild
-} from 'c3react';
+import { Component, useChild } from 'c3react';
 
 export default class Box extends Component<{
     initialText: string;
 }> {
     private readonly useText = useChild(() => this.container, 'text');
 
-    public text: string = ''
+    public text: string = '';
 
     protected onReady() {
         /** Triggered once when ready */

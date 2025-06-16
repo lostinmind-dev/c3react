@@ -1,14 +1,9 @@
 import { app } from './app.ts';
 import { EventsHandler } from './events-handler.ts';
 
-export type UseProps<Props> =
-    Props extends object
-    ? () => Props
-    :
-    Props extends Promise<Props>
-    ? () => Promise<Props>
-    : null
-    ;
+export type UseProps<Props> = Props extends object ? () => Props
+    : Props extends Promise<Props> ? () => Promise<Props>
+    : null;
 
 function isContainer(inst: IWorldInstance): inst is InstanceType.container {
     return (
@@ -17,12 +12,14 @@ function isContainer(inst: IWorldInstance): inst is InstanceType.container {
     );
 }
 export type UseChildCondition<InstType> = (inst: InstType) => boolean;
-export type ComponentConstructor<T extends Component = Component> = new (...args: any[]) => T;
+export type ComponentConstructor<T extends Component = Component> = new (
+    ...args: any[]
+) => T;
 
 export abstract class Component<Props = any> extends EventsHandler<{
-    'touch-start': void,
-    'touch-end': void,
-    'reset': void,
+    'touch-start': void;
+    'touch-end': void;
+    'reset': void;
 }> {
     private static isInited: boolean = false;
     private static readonly cache = new Set<Component>();
@@ -34,16 +31,20 @@ export abstract class Component<Props = any> extends EventsHandler<{
         app.on('hierarchyready', ({ instance }) => {
             if (!isContainer(instance)) return;
 
-            const component = Array.from(this.components).find(c => c.id === instance.instVars.id);
+            const component = Array.from(this.components).find((c) =>
+                c.id === instance.instVars.id
+            );
             if (!component) return;
             component.#ready(instance);
         });
 
         app.on('afteranylayoutend', () => {
-            this.components.forEach(component => component.#reset());
-            this.cache.forEach(component => this.components.delete(component));
+            this.components.forEach((component) => component.#reset());
+            this.cache.forEach((component) =>
+                this.components.delete(component)
+            );
             this.cache.clear();
-        })
+        });
 
         this.isInited = true;
     }
@@ -72,10 +73,12 @@ export abstract class Component<Props = any> extends EventsHandler<{
             const { x, y } = pointer.current;
             const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
 
-            if (!this.isCoordsOverInstance(translatedX, translatedY)) return false;
+            if (!this.isCoordsOverInstance(translatedX, translatedY)) {
+                return false;
+            }
 
             return true;
-        }
+        };
 
         pointer.onDown(() => {
             if (checkClick()) this.emit('touch-start');
@@ -84,7 +87,7 @@ export abstract class Component<Props = any> extends EventsHandler<{
         pointer.onUp(() => {
             if (checkClick()) this.emit('touch-end');
         });
-        }
+    }
 
     #reset() {
         this.emit('reset');

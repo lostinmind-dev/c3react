@@ -3,7 +3,10 @@ export class KeyboardSystem {
     readonly #pressListeners = new Map<string, Set<C3React.Keyboard.Handler>>();
 
     readonly #anyReleaseHandlers = new Set<C3React.Keyboard.Handler>();
-    readonly #releaseListeneres = new Map<string, Set<C3React.Keyboard.Handler>>();
+    readonly #releaseListeneres = new Map<
+        string,
+        Set<C3React.Keyboard.Handler>
+    >();
 
     readonly #keys = new Map<string, C3React.Keyboard.KeyState>();
     #previousKeys = new Map<string, C3React.Keyboard.KeyState>();
@@ -19,7 +22,7 @@ export class KeyboardSystem {
 
         return () => {
             this.#anyPressHandlers.delete(handler);
-        }
+        };
     }
 
     onKeyPressed(key: C3React.Keyboard.Key, handler: C3React.Keyboard.Handler) {
@@ -34,7 +37,7 @@ export class KeyboardSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
     onAnyKeyReleased(handler: C3React.Keyboard.Handler) {
@@ -42,10 +45,13 @@ export class KeyboardSystem {
 
         return () => {
             this.#anyReleaseHandlers.delete(handler);
-        }
+        };
     }
 
-    onKeyReleased(key: C3React.Keyboard.Key, handler: C3React.Keyboard.Handler) {
+    onKeyReleased(
+        key: C3React.Keyboard.Key,
+        handler: C3React.Keyboard.Handler,
+    ) {
         let handlers = this.#releaseListeneres.get(key);
 
         if (!handlers) {
@@ -57,7 +63,7 @@ export class KeyboardSystem {
 
         return () => {
             handlers.delete(handler);
-        }
+        };
     }
 
     isKeyPressed(key: C3React.Keyboard.Key) {
@@ -70,7 +76,7 @@ export class KeyboardSystem {
 
     #onKeyDown(e: KeyboardEvent) {
         for (const handler of this.#anyPressHandlers) {
-            handler(e)
+            handler(e);
         }
 
         const previousState = this.#keys.get(e.code);
@@ -78,7 +84,7 @@ export class KeyboardSystem {
         if (previousState !== 'down') {
             this.#keys.set(e.code, 'down');
 
-            const handlers = this.#pressListeners.get(e.code)
+            const handlers = this.#pressListeners.get(e.code);
 
             if (!handlers) return;
 
@@ -90,12 +96,12 @@ export class KeyboardSystem {
 
     #onKeyUp(e: KeyboardEvent) {
         for (const handler of this.#anyReleaseHandlers) {
-            handler(e)
+            handler(e);
         }
 
         this.#keys.set(e.code, 'up');
 
-        const handlers = this.#releaseListeneres.get(e.code)
+        const handlers = this.#releaseListeneres.get(e.code);
 
         if (!handlers) return;
 
