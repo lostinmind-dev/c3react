@@ -1,3 +1,7 @@
+export function lerp(a: number, b: number, c: number) {
+    return (a + (b - a) * c);
+}
+
 export function random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }

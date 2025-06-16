@@ -1,4 +1,4 @@
-import type { ExtractObjectInstType } from '../component-v2.ts';
+import type { ExtractObjectInstType } from '../component.ts';
 
 export function useChildren<
     N extends keyof IConstructProjectObjects,

@@ -1,4 +1,4 @@
-import type { ExtractObjectInstType } from '../component-v2.ts';
+import type { ExtractObjectInstType } from '../component.ts';
 
 export function useInsts<N extends keyof IConstructProjectObjects>(
     objectName: N,
@@ -9,6 +9,7 @@ export function useInsts<N extends keyof IConstructProjectObjects>(
     return () => {
         const object = runtime.objects[objectName];
 
+        //@ts-ignore;
         instances = object.instances().filter((i) =>
             i.objectType.name === objectName
         ).toArray();

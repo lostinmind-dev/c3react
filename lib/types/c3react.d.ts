@@ -1,24 +1,20 @@
-import type { KeyboardSystem } from '../core/input/keyboard.ts';
-import type { MouseSystem } from '../core/input/mouse.ts';
-import type { PointerSystem } from '../core/input/pointer.ts';
-
 declare global {
     namespace C3React {
-        namespace Pointer {
-            type Handler = (e: ConstructPointerEvent) => void;
-        }
-
         namespace Mouse {
-            type ButtonState = 'up' | 'down' | 'pressed';
-            type Handler = (e: MouseEvent) => void;
+            type Buttons = {
+                left: 0,
+                middle: 1,
+                right: 2,
 
+                fourth: 3,
+                fifth: 4,
+            };
+            type ButtonState = 'up' | 'down' | 'pressed';
             type WheelDirection = 'up' | 'down';
         }
 
         namespace Keyboard {
             type KeyState = 'up' | 'down' | 'pressed';
-            type Handler = (e: KeyboardEvent) => void;
-
             type Side = 'Left' | 'Right';
             type Direction = 'Up' | 'Left' | 'Right' | 'Down';
 
@@ -132,10 +128,8 @@ declare global {
         type Size = { width: number; height: number };
     }
 
+
     const runtime: IRuntime;
-    const keyboard: KeyboardSystem;
-    const mouse: MouseSystem;
-    const pointer: PointerSystem;
 }
 
 export {};

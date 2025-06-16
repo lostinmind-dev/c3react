@@ -1,3 +1,5 @@
+import { pointer } from '../inputs/pointer.ts';
+
 function isCoordsOverBBox(bbox: DOMRect, x: number, y: number) {
     return (
         x > bbox.left &&
@@ -11,7 +13,7 @@ function checkTouched<I extends IWorldInstance>(instance: I) {
     const layer = instance.layer;
     if (!layer.isInteractive) return false;
 
-    const { x, y } = pointer.current;
+    const { x, y } = pointer.getCoords('current');
     const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
 
     return isCoordsOverBBox(
@@ -27,11 +29,11 @@ export function useTouched<I extends IWorldInstance>(
 ) {
     if (typeof instance === 'function') instance = instance();
 
-    pointer.onDown(() => {
+    pointer.on('down', () => {
         if (checkTouched(instance)) handler('start');
     });
 
-    pointer.onUp(() => {
+    pointer.on('up', () => {
         if (checkTouched(instance)) handler('end');
     });
 }

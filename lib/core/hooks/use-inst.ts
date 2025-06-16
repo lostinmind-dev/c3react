@@ -1,4 +1,4 @@
-import type { ExtractObjectInstType } from '../component-v2.ts';
+import type { ExtractObjectInstType } from '../component.ts';
 
 export function useInst<N extends keyof IConstructProjectObjects>(
     objectName: N,
@@ -10,6 +10,7 @@ export function useInst<N extends keyof IConstructProjectObjects>(
         const object = runtime.objects[objectName];
 
         if (condition) {
+            //@ts-ignore;
             instance = object.instances().find((i) => condition(i));
 
             if (!instance) {
@@ -20,7 +21,7 @@ export function useInst<N extends keyof IConstructProjectObjects>(
 
             return instance as ExtractObjectInstType<N>;
         }
-
+        //@ts-ignore;
         instance = object.getFirstInstance() || undefined;
 
         if (!instance) throw new Error(`No any instance was found`);

@@ -1,7 +1,4 @@
 import type { Layout } from './layout.ts';
-import { KeyboardSystem } from './input/keyboard.ts';
-import { MouseSystem } from './input/mouse.ts';
-import { PointerSystem } from './input/pointer.ts';
 
 type InitOptions = Readonly<{
     layouts: Layout[];
@@ -11,21 +8,13 @@ type InitOptions = Readonly<{
 type EventHandler<Data = any> = (data: Data) => void;
 
 export abstract class app {
-    private static readonly events = new Map<
-        keyof RuntimeEventMap,
-        Set<EventHandler>
-    >();
+    private static readonly events = new Map<keyof RuntimeEventMap, Set<EventHandler>>();
+    private static readonly cachedSubscribers = new Set<() => void>();
     private static isInited: boolean = false;
 
     private static globalize(runtime: IRuntime) {
         //@ts-ignore @GLOBAL
         globalThis.runtime = runtime;
-        //@ts-ignore @GLOBAL
-        globalThis.keyboard = new KeyboardSystem(runtime);
-        //@ts-ignore @GLOBAL
-        globalThis.mouse = new MouseSystem(runtime);
-        //@ts-ignore @GLOBAL
-        globalThis.pointer = new PointerSystem(runtime);
     }
 
     static async addScript(url: string) {
@@ -43,6 +32,8 @@ export abstract class app {
     static init(opts: InitOptions) {
         if (this.isInited) return;
 
+        app.on('afteranylayoutend', () => this.cachedSubscribers.forEach(unsubscribe => unsubscribe()));
+
         runOnStartup(async (runtime) => {
             this.isInited = true;
 
@@ -58,6 +49,30 @@ export abstract class app {
         });
     }
 
+    /** Cached callback, will be unsubscribed after any layout end */
+    static onCached<Event extends keyof RuntimeEventMap>(
+        event: Event,
+        handler: EventHandler<RuntimeEventMap[Event]>,
+    ) {
+        let handlers = this.events.get(event);
+
+        if (!handlers) {
+            this.events.set(event, new Set());
+            handlers = this.events.get(event)!;
+        }
+
+        handlers.add(handler);
+        if (typeof runtime !== 'undefined') runtime.addEventListener(event, handler);
+
+        const unsubscribe = () => {
+            runtime.removeEventListener(event, handler);
+            handlers.delete(handler);
+        }
+
+        this.cachedSubscribers.add(unsubscribe);
+    }
+
+    /** Returns method for unsubscribing from event */
     static on<Event extends keyof RuntimeEventMap>(
         event: Event,
         handler: EventHandler<RuntimeEventMap[Event]>,
@@ -70,21 +85,21 @@ export abstract class app {
         }
 
         handlers.add(handler);
-    }
+        if (typeof runtime !== 'undefined') runtime.addEventListener(event, handler);
 
-    static release(): void {
-        for (const [event, handlers] of this.events) {
-            for (const handler of handlers) {
-                runtime.removeEventListener(event, handler);
-            }
+        return () => {
+            runtime.removeEventListener(event, handler);
+            handlers.delete(handler);
         }
-
-        this.events.clear();
     }
-}
 
-app.on('afteranylayoutend', () => {
-    keyboard.release();
-    pointer.release();
-    mouse.release();
-});
+    // static release(): void {
+    //     for (const [event, handlers] of this.events) {
+    //         for (const handler of handlers) {
+    //             runtime.removeEventListener(event, handler);
+    //         }
+    //     }
+
+    //     this.events.clear();
+    // }
+}
