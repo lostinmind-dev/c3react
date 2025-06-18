@@ -95,8 +95,6 @@ app.init({
 app.on('afteranylayoutend', () => gsap.globalTimeline.clear());
 ```
 
-# 🔌 Using "C3React" Component System
-
 _layouts/main.layout.ts_
 
 ```typescript
