@@ -9,7 +9,7 @@ export type ExtractObjectInstType<N extends keyof IConstructProjectObjects> =
         >
     >;
 
-function pickInst<N extends keyof IConstructProjectObjects>(
+export function pickInst<N extends keyof IConstructProjectObjects>(
     objectName: N,
     condition?: (inst: ExtractObjectInstType<N>) => boolean,
 ) {
@@ -29,12 +29,6 @@ function pickInst<N extends keyof IConstructProjectObjects>(
     return instance;
 }
 
-function clone<T>(obj: T) {
-    const proto = Object.getPrototypeOf(obj);
-    const clone = Object.create(proto);
-    return Object.assign(clone, obj) as T;
-}
-
 export const components = new Collection<Component>();
 
 /**
@@ -42,10 +36,8 @@ export const components = new Collection<Component>();
  * Protected methods are for using ONLY inside component
  * get/set without public/protected are for using BOTH inside AND outside component
  */
-export abstract class Component<
-    S extends Record<string, any> | Array<any> = any,
-    N extends keyof IConstructProjectObjects = any,
-> {
+
+export abstract class Component<N extends keyof IConstructProjectObjects = any>{
     private static initsCount: number = 0;
 
     static init() {
@@ -62,29 +54,27 @@ export abstract class Component<
                     component.objectName,
                     component.pickCondition,
                 );
-                // if (instance['instVars'] && instance['instVars']['id']) {
-                //     console.log(instance.instVars['id'])
-                // }
+
                 if (instance !== pickedInstance) continue;
 
                 component.#isDestroyed = false;
-                component.instance = pickedInstance;
+                component.root = pickedInstance;
             }
         });
 
         app.on('hierarchyready', ({ instance }) => {
             const component = components.toArray().find((c) =>
-                c.instance === instance
+                c.root === instance
             );
-            if (component) component.onReady();
+            if (component) component.onRootReady();
         });
 
         app.on('instancedestroy', ({ instance }) => {
-            const component = components.toArray().find((c) => c.instance === instance);
+            const component = components.toArray().find((c) => c.root === instance);
             if (component) {
                 component.#isDestroyed = true;
-                component.onDestroyed();
-                component.instance = undefined;
+                component.onRootDestroyed();
+                component.root = undefined;
                 if (component.isCached) components.delete(component);
             }
         });
@@ -92,14 +82,12 @@ export abstract class Component<
         app.on('afteranylayoutend', () => {
             const cachedComponents = components.toArray().filter(c => c.isCached);
             cachedComponents.forEach(c => components.delete(c));
-        })
+        });
 
         this.initsCount++;
     }
 
-    private instance?: ExtractObjectInstType<N>;
-    private previousState: S = {} as S;
-    private state: S = {} as S;
+    private root?: ExtractObjectInstType<N>;
 
     #isDestroyed: boolean = false;
 
@@ -121,16 +109,9 @@ export abstract class Component<
     }
 
     constructor(
-        initialState?: S | (() => S),
         private readonly objectName?: N,
-        private readonly pickCondition?: (
-            inst: ExtractObjectInstType<N>,
-        ) => boolean,
+        private readonly pickCondition?: (inst: ExtractObjectInstType<N>) => boolean,
     ) {
-        this.state = (typeof initialState === 'function')
-            ? initialState()
-            : initialState;
-
         components.add(this);
     }
 
@@ -138,14 +119,14 @@ export abstract class Component<
      * Returns ROOT instance of component that was found by provided "objectName" & optional "pickCondition" in constructor
      */
     protected getRoot() {
-        if (!this.instance) {
+        if (!this.root) {
             if (!this.objectName) {
                 throw new Error(`Can't use root instance NOT visual component`);
             }
             throw new Error(`Root instance was NOT defined yet`);
         }
 
-        return this.instance;
+        return this.root;
     }
 
     /** 
@@ -156,44 +137,11 @@ export abstract class Component<
      * Use this method for cases when you creating instance, setting up properties 
      * For example modifying *instance.instVars* for success condition in component class
      */
-    protected setRoot(instance: ExtractObjectInstType<N>) {
-        if (this.instance) throw new Error(`Can't set ROOT instance, it was already defined before!`);
+    protected setRoot(root: ExtractObjectInstType<N>) {
+        if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
 
-        this.instance = instance;
-        this.onReady();
-    }
-
-    protected getState() {
-        return this.state;
-    }
-
-    protected getPreviousState() {
-        return this.previousState;
-    }
-
-    public setState(state: Partial<S> | ((prevState: S) => Partial<S>)) {
-        
-        if (typeof state === 'function') {
-            this.previousState = clone(this.state);
-
-            const $ = state(this.state);
-
-            let key: keyof S;
-            for (key in $) {
-                // if (typeof $[key] === 'undefined') continue;
-                this.state[key] = $[key]!;
-            }
-            this.onStateChanged();
-        } else {
-            this.previousState = clone(this.state);
-
-            let key: keyof S;
-            for (key in state) {
-                // if (typeof state[key] === 'undefined') continue;
-                this.state[key] = state[key]!;
-            }
-            this.onStateChanged();
-        }
+        this.root = root;
+        this.onRootReady();
     }
 
     /**
@@ -202,24 +150,21 @@ export abstract class Component<
      * Runtime Events
      * @see https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/iruntime#internalH1Link1
      */
-    protected onReady() { };
-
-    /** Truggers when setState() was called */
-    protected onStateChanged() { };
+    protected onRootReady() { };
 
     /** Triggers when ROOT instance was destroyed */
-    protected onDestroyed() { };
+    protected onRootDestroyed() { };
 
-    public create(opts?: Parameters<typeof createInst>[1]) {
+    public createRoot(opts?: Parameters<typeof createInst>[1]) {
         if (!this.objectName) return;
 
-        this.instance = createInst(this.objectName, opts)
+        this.root = createInst(this.objectName, opts)
     }
 
-    public destroy() {
-        if (this.isDestroyed || !this.instance) return;
+    public destroyRoot() {
+        if (this.isDestroyed || !this.root) return;
 
-        this.instance.destroy();
+        this.root.destroy();
     }
 }
 

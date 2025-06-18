@@ -3,7 +3,7 @@ import type { ExtractObjectInstType } from '../component.ts';
 export function createInst<N extends keyof IConstructProjectObjects>(
     objectName: N,
     opts?: Partial<{
-        layer: string | number,
+        layerName: string,
         x: number,
         y: number,
         templateName: string,
@@ -13,7 +13,7 @@ export function createInst<N extends keyof IConstructProjectObjects>(
 ) {
     const object = runtime.objects[objectName];
     const instance = object.createInstance(
-        opts?.layer || 0,
+        opts?.layerName || 0,
         opts?.x || 0,
         opts?.y || 0,
         (opts?.templateName) ? true : false,

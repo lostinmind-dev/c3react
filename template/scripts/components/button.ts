@@ -1,58 +1,51 @@
-import { Component, useChild, useTouched, utils } from 'c3react';
+import { Component, useChild, useTouched, utils, useState } from 'c3react';
 import gsap from 'gsap';
 
-export default class Button extends Component<{
-    onClicked?: () => void,
-    label: string,
-    color: Vec3Arr,
-}, 'button'> {
+export default class Button extends Component<'button'> {
     private readonly useLabel = useChild(() => this.getRoot(), 'text');
 
-    private initialSize: C3React.Size = {
+    readonly label = useState('C3React');
+    readonly onClickedHandler = useState<() => void>(() => {});
+    readonly color = useState<Vec3Arr>([148, 169, 184]);
+
+    private readonly initialSize = useState<C3React.Size>({
         width: 0,
         height: 0,
-    };
+    });
 
     constructor(id: 'c3react') {
-        super(
-            { color: [0, 225, 199], label: 'C3React' },
-            'button',
-            (i) => i.instVars.id === id
-        );
+        super('button', (i) => i.instVars.id === id);
     }
 
-    protected override onReady(): void {
-        const { label, color } = this.getState();
+    protected override onRootReady() {
         const { width, height } = this.getRoot();
-        this.initialSize = { width, height };
+        this.initialSize.setValue({ width, height });
 
-        this.useLabel().text = label;
-        this.changeColor(color);
+        this.updateText();
+        this.updateColor();
 
         useTouched(() => this.getRoot(), (type) => {
             switch (type) {
                 case 'start': { this.animateIn(); } break;
-                case 'end': { 
-                    const { onClicked } = this.getState();
-
+                case 'end': {
+                    const onClicked = this.onClickedHandler.getValue();
                     this.animateOut();
-                    onClicked?.();
-                 } break;
+                    onClicked();
+                } break;
             }
-        })
+        });
+
+        this.label.on('update', () => this.updateText());
+        this.color.on('update', () => this.updateColor());
     }
 
-    protected override onStateChanged(): void {
-        const { label, color } = this.getState();
-
-        if (this.getPreviousState().label !== label) {
-            this.useLabel().typewriterText(label, 0.5);
-        }
-
-        this.changeColor(color);
+    private updateText() {
+        const label = this.label.getValue();
+        this.useLabel().text = label;
     }
 
-    private changeColor(color: Vec3Arr) {
+    private updateColor() {
+        const color = this.color.getValue();
         const root = this.getRoot();
 
         const [r, g, b] = root.colorRgb;
@@ -72,9 +65,11 @@ export default class Button extends Component<{
     }
 
     private animateIn() {
+        const { width,height } = this.initialSize.getValue();
+
         gsap.to(this.getRoot(), {
-            width: this.initialSize.width / 1.2,
-            height: this.initialSize.height / 1.2,
+            width: width / 1.2,
+            height: height / 1.2,
 
             duration: 0.2,
             ease: 'power4.out',
@@ -83,9 +78,11 @@ export default class Button extends Component<{
     }
 
     private animateOut() {
+        const { width, height } = this.initialSize.getValue();
+
         gsap.to(this.getRoot(), {
-            width: this.initialSize.width,
-            height: this.initialSize.height,
+            width,
+            height,
 
             duration: 0.2,
             ease: 'power4.out',

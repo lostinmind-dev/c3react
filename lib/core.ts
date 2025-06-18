@@ -14,6 +14,7 @@ export { Modal } from './core/modal.ts';
 export * as utils from './core/utils.ts';
 
 /** Hooks */
+export { useState } from './core/hooks/use-state.ts';
 export { useChild } from './core/hooks/use-child.ts';
 export { useChildren } from './core/hooks/use-children.ts';
 export { useInst } from './core/hooks/use-inst.ts';

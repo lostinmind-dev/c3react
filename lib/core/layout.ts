@@ -30,19 +30,19 @@ export abstract class Layout {
 
     private setRoot(layout: IAnyProjectLayout) {
         if (this.layout) throw new Error(`Can't set ROOT layout, it was already defined before!`);
-        
-        layout.addEventListener('beforelayoutstart', () => this.beforeStart?.());
-        layout.addEventListener('afterlayoutstart', () => this.onStart?.());
-        layout.addEventListener('beforelayoutend', () => this.beforeEnd?.());
-        layout.addEventListener('afterlayoutend', () => this.onEnd?.());
+
+        layout.addEventListener('beforelayoutstart', () => this.beforeStart());
+        layout.addEventListener('afterlayoutstart', () => this.onStart());
+        layout.addEventListener('beforelayoutend', () => this.beforeEnd());
+        layout.addEventListener('afterlayoutend', () => this.onEnd());
 
         this.layout = layout;
     }
 
-    protected readonly beforeStart?: () => void;
-    protected readonly onStart?: () => void;
-    protected readonly beforeEnd?: () => void;
-    protected readonly onEnd?: () => void;
+    protected beforeStart() { }
+    protected onStart() { }
+    protected beforeEnd() { }
+    protected onEnd() { }
 }
 
 Layout.init();

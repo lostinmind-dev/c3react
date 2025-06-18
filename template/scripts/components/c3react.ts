@@ -1,10 +1,10 @@
 import { Component } from 'c3react';
 import gsap from 'gsap';
 
-export default class C3React extends Component<{}, 'c3react'> {
-    constructor() { super({}, 'c3react') }
+export default class C3React extends Component<'c3react'> {
+    constructor() { super('c3react') }
 
-    protected override onReady(): void {
+    protected override onRootReady(): void {
         const root = this.getRoot();
 
         root.setSize(0, 0);
@@ -18,12 +18,12 @@ export default class C3React extends Component<{}, 'c3react'> {
         });
     }
 
-    protected override onDestroyed(): void {
+    protected override onRootDestroyed(): void {
         gsap.killTweensOf(this.getRoot());
         console.log('C3React component was destroyed :3');
     }
 
-    play() {
+    playRotation() {
         gsap.to(this.getRoot(), {
             angleDegrees: 360,
 

@@ -9,22 +9,16 @@ export class MainLayout extends Layout {
 
     protected override onStart = () => {
         const onClicked = () => {
-            this.c3react.play();
+            this.c3react.playRotation();
 
-            this.button.setState({
-                color: [
-                    utils.random(0, 255),
-                    utils.random(0, 255),
-                    utils.random(0, 255)
-                ]
-            })
+            this.button.color.setValue([
+                utils.random(0, 255),
+                utils.random(0, 255),
+                utils.random(0, 255)
+            ]);
         };
 
-        this.button.setState({
-            label: 'C3React :>',
-            color: [0, 225, 199],
-            onClicked,
-        });
+        this.button.onClickedHandler.setValue(onClicked);
     };
 }
 
