@@ -14,8 +14,8 @@ scripting
 ## Usage
 
 - **[💪 Advantages](#-advantages)**
-- **[`🚀 Creating "C3React" project`](#-creating-c3react-project)**
-- **[`🔌 Using "C3React" Component System`](#-using-c3react-component-system)**
+- **[🚀 Quickstart](#-quickstart)**
+- **[`🚀 "C3React" Template project`](#-c3react-template-project)**
 
 # 💪 Advantages
 
@@ -28,11 +28,12 @@ scripting
 >   [JSR](https://jsr.io/) packages**
 
 **PRINCIPLES**
-> 1. Если используется Root инстанст, он ни в коем случае не должен подвергатся изменений напрямую извне
-> 1. State компонента через getState() может быть использован только внутри
-> 2. Изменять State компонента можно извне
 
-короче инкапсуляция ебанная ага да
+- _**public**_ methods are for using **ONLY** outside component
+- _**protected**_ methods are for using **ONLY** inside component
+- get/set without _**public**_/_**protected**_ are for using **BOTH** inside and
+  outside component
+- _setState()_ component's method must be using **ONLY** outside
 
 **Project Structure**
 
@@ -45,29 +46,53 @@ scripts/
 │   └── *.ts
 ├── layouts/
 │   └── *.layout.ts
-├── systems/
-│   └── *.system.ts
 └── main.ts
 ```
 
-# 🚀 Creating "C3React" project
+# 🚀 Quickstart
+
+- **Install [Deno (JavaScript runtime)](https://docs.deno.com/runtime/)**
+- **Open C3 Template project in VSCode** `./template/`
+- **Install dependencies**
+
+```bash
+npm install
+```
+
+- **Open C3 project** `./project/`
+- **Run following command:**
+
+```bash
+deno task dev
+```
+
+# 🚀 "C3React" Template project
+
+_Template is using GSAP tool for small beautiful animations (NPM module)_
 
 _main.ts_
 
 ```typescript
-import app from 'c3react';
-import { MainLayout } from '@/layouts/main.layout.ts';
+import app, { pointer } from 'c3react';
+import gsap from 'gsap';
+
+import mainLayout from '@/layouts/main.layout.ts';
+
+pointer.init();
 
 app.init({
     layouts: [
         /** Initialize layouts here... */
-        new MainLayout(),
+        mainLayout,
     ],
     beforeStart: async () => {
-        /** Load packages or modules here... */
-        // app.addScript('https://cdn.com/index.js');
+        /** Do someting it's like runOnStartup() inside block  */
+        console.log('Before start!');
     },
 });
+
+/** Avoid errors with active GSAP animations when changing layout */
+app.on('afteranylayoutend', () => gsap.globalTimeline.clear());
 ```
 
 # 🔌 Using "C3React" Component System
@@ -75,54 +100,186 @@ app.init({
 _layouts/main.layout.ts_
 
 ```typescript
-import { Layout } from 'c3react';
-import Box from '@/components/box.ts';
+import { Layout, utils } from 'c3react';
 
-function getInitialText() {
-    return { initialText: 'Count 0' };
-}
+import C3React from '@/components/c3react.ts';
+import Button from '@/components/button.ts';
 
 export class MainLayout extends Layout {
-    readonly box = new Box('box', getInitialText);
-
-    constructor() {
-        super('main');
-    }
+    private readonly c3react = new C3React();
+    private readonly button = new Button('c3react');
 
     protected override onStart = () => {
-        let count = 0;
+        const onClicked = () => {
+            this.c3react.play();
 
-        setInterval(() => {
-            this.box.text = `Count ${count}`;
-            this.box.update();
-            count++;
-        }, 1000);
+            this.button.setState({
+                color: [
+                    utils.random(0, 255),
+                    utils.random(0, 255),
+                    utils.random(0, 255),
+                ],
+            });
+        };
+
+        this.button.setState({
+            label: 'C3React :>',
+            color: [0, 225, 199],
+            onClicked,
+        });
     };
+}
+
+const layout = new MainLayout('main');
+export default layout;
+```
+
+_components/c3react.ts_
+
+```typescript
+import { Component } from 'c3react';
+import gsap from 'gsap';
+
+export default class C3React extends Component<{}, 'c3react'> {
+    constructor() {
+        super({}, 'c3react');
+    }
+
+    protected override onReady(): void {
+        const root = this.getRoot();
+
+        root.setSize(0, 0);
+
+        gsap.to(root, {
+            width: 428,
+            height: 428,
+
+            duration: 1.25,
+            ease: 'back.out',
+        });
+    }
+
+    protected override onDestroyed(): void {
+        gsap.killTweensOf(this.getRoot());
+        console.log('C3React component was destroyed :3');
+    }
+
+    play() {
+        gsap.to(this.getRoot(), {
+            angleDegrees: 360,
+
+            duration: 1,
+            ease: 'power3.out',
+            overwrite: true,
+        });
+    }
 }
 ```
 
-_components/box.ts_
+_components/button.ts_
 
 ```typescript
-import { Component, useChild } from 'c3react';
+import { Component, useChild, useTouched, utils } from 'c3react';
+import gsap from 'gsap';
 
-export default class Box extends Component<{
-    initialText: string;
-}> {
-    private readonly useText = useChild(() => this.container, 'text');
+export default class Button extends Component<{
+    onClicked?: () => void;
+    label: string;
+    color: Vec3Arr;
+}, 'button'> {
+    private readonly useLabel = useChild(() => this.getRoot(), 'text');
 
-    public text: string = '';
+    private initialSize: C3React.Size = {
+        width: 0,
+        height: 0,
+    };
 
-    protected onReady() {
-        /** Triggered once when ready */
-        const { initialText } = this.useProps();
-        this.useText().text = initialText;
+    constructor(id: 'c3react') {
+        super(
+            { color: [0, 225, 199], label: 'C3React' },
+            'button',
+            (i) => i.instVars.id === id,
+        );
     }
 
-    update() {
-        const text = this.useText();
-        this.useText().x = 0;
-        text.typewriterText(this.text, 0.25);
+    protected override onReady(): void {
+        const { label, color } = this.getState();
+        const { width, height } = this.getRoot();
+        this.initialSize = { width, height };
+
+        this.useLabel().text = label;
+        this.changeColor(color);
+
+        useTouched(() => this.getRoot(), (type) => {
+            switch (type) {
+                case 'start':
+                    {
+                        this.animateIn();
+                    }
+                    break;
+                case 'end':
+                    {
+                        const { onClicked } = this.getState();
+
+                        this.animateOut();
+                        onClicked?.();
+                    }
+                    break;
+            }
+        });
+    }
+
+    protected override onStateChanged(): void {
+        const { label, color } = this.getState();
+
+        if (this.getPreviousState().label !== label) {
+            this.useLabel().typewriterText(label, 0.5);
+        }
+
+        this.changeColor(color);
+    }
+
+    private changeColor(color: Vec3Arr) {
+        const root = this.getRoot();
+
+        const [r, g, b] = root.colorRgb;
+        const rgb = utils.rgbToVec3(color);
+
+        const $ = { r, g, b };
+        gsap.to($, {
+            r: rgb[0],
+            g: rgb[1],
+            b: rgb[2],
+
+            duration: 1,
+            ease: 'power4.out',
+            overwrite: true,
+            onUpdate: () => {
+                root.colorRgb = [$.r, $.g, $.b];
+            },
+        });
+    }
+
+    private animateIn() {
+        gsap.to(this.getRoot(), {
+            width: this.initialSize.width / 1.2,
+            height: this.initialSize.height / 1.2,
+
+            duration: 0.2,
+            ease: 'power4.out',
+            overwrite: true,
+        });
+    }
+
+    private animateOut() {
+        gsap.to(this.getRoot(), {
+            width: this.initialSize.width,
+            height: this.initialSize.height,
+
+            duration: 0.2,
+            ease: 'power4.out',
+            overwrite: true,
+        });
     }
 }
 ```
