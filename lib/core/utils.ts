@@ -1,3 +1,7 @@
+export function rgbToVec3(rgb: Vec3Arr) {
+    return [rgb[0] / 255, rgb[1] / 255, rgb[2] / 255] as Vec3Arr satisfies Vec3Arr;
+}
+
 export function lerp(a: number, b: number, c: number) {
     return (a + (b - a) * c);
 }

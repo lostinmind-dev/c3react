@@ -1,418 +1,53 @@
 {
-    "name": "objects",
-    "layers": [
-        {
-            "name": "Layer 0",
-            "overriden": 0,
-            "subLayers": [],
-            "instances": [
-                {
-                    "type": "container",
-                    "properties": {
-                        "initially-visible": true,
-                        "origin": "top-left",
-                        "wrap-horizontal": "repeat",
-                        "wrap-vertical": "repeat",
-                        "image-offset-x": 0,
-                        "image-offset-y": 0,
-                        "image-scale-x": 1,
-                        "image-scale-y": 1,
-                        "image-angle": 0,
-                        "enable-tile-randomization": false,
-                        "x-random": 1,
-                        "y-random": 1,
-                        "angle-random": 1,
-                        "blend-margin-x": 0.1,
-                        "blend-margin-y": 0.1
-                    },
-                    "uid": 3,
-                    "sid": 278932816459280,
-                    "tags": "",
-                    "instanceVariables": {
-                        "id": ""
-                    },
-                    "behaviors": {},
-                    "template": {
-                        "mode": "template",
-                        "templateName": "box",
-                        "sourceTemplateName": "",
-                        "replicaHierarchyInSyncWithTemplate": false,
-                        "templatePropagateHierarchyChanges": true,
-                        "replicaIgnoreTemplateHierarchyChanges": false,
-                        "components": [
-                            {
-                                "id": "plugin",
-                                "component": [
-                                    {
-                                        "key": "plugin",
-                                        "state": [
-                                            [
-                                                "initially-visible",
-                                                true
-                                            ],
-                                            [
-                                                "origin",
-                                                true
-                                            ],
-                                            [
-                                                "wrap-horizontal",
-                                                true
-                                            ],
-                                            [
-                                                "wrap-vertical",
-                                                true
-                                            ],
-                                            [
-                                                "image-offset-x",
-                                                true
-                                            ],
-                                            [
-                                                "image-offset-y",
-                                                true
-                                            ],
-                                            [
-                                                "image-scale-x",
-                                                true
-                                            ],
-                                            [
-                                                "image-scale-y",
-                                                true
-                                            ],
-                                            [
-                                                "image-angle",
-                                                true
-                                            ],
-                                            [
-                                                "enable-tile-randomization",
-                                                true
-                                            ],
-                                            [
-                                                "x-random",
-                                                true
-                                            ],
-                                            [
-                                                "y-random",
-                                                true
-                                            ],
-                                            [
-                                                "angle-random",
-                                                true
-                                            ],
-                                            [
-                                                "blend-margin-x",
-                                                true
-                                            ],
-                                            [
-                                                "blend-margin-y",
-                                                true
-                                            ]
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "id": "instance-variable",
-                                "component": [
-                                    {
-                                        "key": "instance-variable",
-                                        "state": [
-                                            {
-                                                "iv": "id",
-                                                "state": true
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                "id": "behavior",
-                                "component": []
-                            },
-                            {
-                                "id": "effect",
-                                "component": []
-                            },
-                            {
-                                "id": "world-instance",
-                                "component": [
-                                    {
-                                        "key": "world-instance",
-                                        "state": [
-                                            [
-                                                "x",
-                                                false
-                                            ],
-                                            [
-                                                "y",
-                                                false
-                                            ],
-                                            [
-                                                "z",
-                                                true
-                                            ],
-                                            [
-                                                "w",
-                                                true
-                                            ],
-                                            [
-                                                "h",
-                                                true
-                                            ],
-                                            [
-                                                "a",
-                                                true
-                                            ],
-                                            [
-                                                "o",
-                                                true
-                                            ],
-                                            [
-                                                "c",
-                                                true
-                                            ],
-                                            [
-                                                "sx",
-                                                true
-                                            ],
-                                            [
-                                                "sy",
-                                                true
-                                            ],
-                                            [
-                                                "bm",
-                                                true
-                                            ],
-                                            [
-                                                "twpx",
-                                                true
-                                            ],
-                                            [
-                                                "twpy",
-                                                true
-                                            ],
-                                            [
-                                                "twpz",
-                                                true
-                                            ],
-                                            [
-                                                "twpw",
-                                                true
-                                            ],
-                                            [
-                                                "twph",
-                                                true
-                                            ],
-                                            [
-                                                "twpa",
-                                                true
-                                            ],
-                                            [
-                                                "dwp",
-                                                true
-                                            ],
-                                            [
-                                                "ssm",
-                                                true
-                                            ]
-                                        ]
-                                    }
-                                ]
-                            }
-                        ],
-                        "replicasUIDs": null
-                    },
-                    "sceneGraphData": {
-                        "parent-uid": null,
-                        "uid": 3,
-                        "children": [
-                            {
-                                "uid": 2,
-                                "flags": {
-                                    "x": true,
-                                    "y": true,
-                                    "z": true,
-                                    "w": true,
-                                    "h": true,
-                                    "a": true,
-                                    "o": false,
-                                    "v": false,
-                                    "d": true,
-                                    "sm": "normal"
-                                }
-                            }
-                        ],
-                        "flags": {
-                            "x": true,
-                            "y": true,
-                            "z": true,
-                            "w": true,
-                            "h": true,
-                            "a": true,
-                            "o": false,
-                            "v": false,
-                            "d": true,
-                            "sm": "normal"
-                        },
-                        "preview": {
-                            "transformX": 0,
-                            "transformY": 0,
-                            "transformZElevation": 0,
-                            "transformW": 0,
-                            "transformH": 0,
-                            "transformA": 0,
-                            "transformSX": 0,
-                            "transformSY": 0,
-                            "transformO": 0,
-                            "previewSceneGraph": false
-                        }
-                    },
-                    "instanceFolderItem": {
-                        "sid": 278932816459280,
-                        "expanded": true
-                    },
-                    "showing": true,
-                    "locked": false,
-                    "world": {
-                        "x": 366.94865665956604,
-                        "y": -111.59686859296235,
-                        "width": 100,
-                        "height": 100,
-                        "originX": 0,
-                        "originY": 0,
-                        "color": [
-                            1,
-                            1,
-                            1,
-                            1
-                        ],
-                        "angle": 0,
-                        "zElevation": 0
-                    }
-                },
-                {
-                    "type": "text",
-                    "properties": {
-                        "text": "Text",
-                        "enable-bbcode": true,
-                        "font": "Arial",
-                        "size": 12,
-                        "line-height": 0,
-                        "bold": false,
-                        "italic": false,
-                        "color": [
-                            0,
-                            0,
-                            0,
-                            1
-                        ],
-                        "horizontal-alignment": "left",
-                        "vertical-alignment": "top",
-                        "wrapping": "word",
-                        "text-direction": "ltr",
-                        "icon-set": -1,
-                        "initially-visible": true,
-                        "origin": "top-left",
-                        "read-aloud": false
-                    },
-                    "uid": 2,
-                    "sid": 724683466686182,
-                    "tags": "",
-                    "instanceVariables": {},
-                    "behaviors": {},
-                    "sceneGraphData": {
-                        "parent-uid": 3,
-                        "uid": 2,
-                        "flags": {
-                            "x": true,
-                            "y": true,
-                            "z": true,
-                            "w": true,
-                            "h": true,
-                            "a": true,
-                            "o": false,
-                            "v": false,
-                            "d": true,
-                            "sm": "normal"
-                        },
-                        "preview": {
-                            "transformX": 0,
-                            "transformY": 0,
-                            "transformZElevation": 0,
-                            "transformW": 0,
-                            "transformH": 0,
-                            "transformA": 0,
-                            "transformSX": 0,
-                            "transformSY": 0,
-                            "transformO": 0,
-                            "previewSceneGraph": false
-                        }
-                    },
-                    "instanceFolderItem": {
-                        "sid": 724683466686182,
-                        "expanded": true
-                    },
-                    "showing": true,
-                    "locked": false,
-                    "world": {
-                        "x": 401.32451543709834,
-                        "y": -69.18975715190288,
-                        "width": 52.469093641144525,
-                        "height": 40.24520183047608,
-                        "originX": 0,
-                        "originY": 0,
-                        "color": [
-                            1,
-                            1,
-                            1,
-                            1
-                        ],
-                        "angle": 0,
-                        "zElevation": 0
-                    }
-                }
-            ],
-            "sid": 820095395704108,
-            "effectTypes": [],
-            "isInitiallyVisible": true,
-            "isInitiallyInteractive": true,
-            "isHTMLElementsLayer": false,
-            "color": [
-                1,
-                1,
-                1,
-                1
-            ],
-            "backgroundColor": [
-                1,
-                1,
-                1,
-                1
-            ],
-            "isTransparent": false,
-            "parallaxX": 1,
-            "parallaxY": 1,
-            "scaleRate": 1,
-            "forceOwnTexture": false,
-            "renderingMode": "3d",
-            "drawOrder": "z-order",
-            "useRenderCells": false,
-            "blendMode": "normal",
-            "zElevation": 0,
-            "global": false
-        }
-    ],
-    "scene-graphs-folder-root": {
-        "items": [],
-        "subfolders": []
-    },
-    "sid": 275767118717101,
-    "nonworld-instances": [],
-    "effectTypes": [],
-    "width": 2160,
-    "height": 3300,
-    "unboundedScrolling": false,
-    "vpX": 0.5,
-    "vpY": 0.5,
-    "projection": "perspective",
-    "eventSheet": null
+	"name": "objects",
+	"layers": [
+		{
+			"name": "Layer 0",
+			"overriden": 0,
+			"subLayers": [],
+			"instances": [],
+			"sid": 820095395704108,
+			"effectTypes": [],
+			"isInitiallyVisible": true,
+			"isInitiallyInteractive": true,
+			"isHTMLElementsLayer": false,
+			"color": [
+				1,
+				1,
+				1,
+				1
+			],
+			"backgroundColor": [
+				1,
+				1,
+				1,
+				1
+			],
+			"isTransparent": false,
+			"parallaxX": 1,
+			"parallaxY": 1,
+			"scaleRate": 1,
+			"forceOwnTexture": false,
+			"renderingMode": "3d",
+			"drawOrder": "z-order",
+			"useRenderCells": false,
+			"blendMode": "normal",
+			"zElevation": 0,
+			"global": false
+		}
+	],
+	"scene-graphs-folder-root": {
+		"items": [],
+		"subfolders": []
+	},
+	"sid": 275767118717101,
+	"nonworld-instances": [],
+	"effectTypes": [],
+	"width": 2160,
+	"height": 3300,
+	"unboundedScrolling": false,
+	"vpX": 0.5,
+	"vpY": 0.5,
+	"projection": "perspective",
+	"eventSheet": null
 }

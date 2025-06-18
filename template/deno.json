@@ -1,4 +1,5 @@
 {
+    "nodeModulesDir": "manual",
     "name": "@c3react/template",
     "version": "1.0.0",
     "compilerOptions": {
@@ -13,10 +14,9 @@
         ]
     },
     "tasks": {
-        "bundle:tsdefs": "",
-        "dev": "vite build --watch",
-        "build:dev": "deno bundle --output ./project/scripts/main.js ./scripts/main.ts",
-        "build:prod": "deno bundle --output ./project/scripts/main.js --minify ./scripts/main.ts"
+        "bundledts": "deno run -A ../lib/cli.ts bundledts",
+        "dev": "deno run -A ../lib/cli.ts dev",
+        "build": "deno run -A ../lib/cli.ts build"
     },
     "imports": {
         "c3react": "../mod.ts",

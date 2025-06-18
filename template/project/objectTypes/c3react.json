@@ -1,0 +1,64 @@
+{
+	"name": "c3react",
+	"plugin-id": "Sprite",
+	"sid": 644275590809139,
+	"isGlobal": false,
+	"editorNewInstanceIsReplica": true,
+	"instanceVariables": [],
+	"behaviorTypes": [],
+	"effectTypes": [],
+	"animations": {
+		"items": [
+			{
+				"frames": [
+					{
+						"width": 1024,
+						"height": 1024,
+						"originX": 0.5,
+						"originY": 0.5,
+						"originalSource": "",
+						"exportFormat": "lossless",
+						"exportQuality": 0.8,
+						"fileType": "image/png",
+						"imageSpriteId": 2671462,
+						"collisionPoly": {
+							"points": [
+								0.312,
+								0.07466666666666667,
+								0.6886666666666666,
+								0.07466666666666667,
+								0.7673333333333333,
+								0.11533333333333333,
+								0.9713333333333334,
+								0.526,
+								0.756,
+								0.8966666666666666,
+								0.6886666666666666,
+								0.926,
+								0.312,
+								0.926,
+								0.23333333333333334,
+								0.8853333333333333,
+								0.02666666666666667,
+								0.49333333333333335,
+								0.24466666666666667,
+								0.104
+							]
+						},
+						"useCollisionPoly": true,
+						"duration": 1,
+						"tag": ""
+					}
+				],
+				"sid": 119924000762566,
+				"name": "main",
+				"isLooping": true,
+				"isPingPong": false,
+				"repeatCount": 1,
+				"repeatTo": 0,
+				"speed": 60
+			}
+		],
+		"subfolders": []
+	}
+}

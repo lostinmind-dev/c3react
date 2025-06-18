@@ -1,24 +1,32 @@
-import { Layout } from 'c3react';
-import Box from '@/components/box.ts';
+import { Layout, utils } from 'c3react';
 
-function getInitialText() {
-    return { initialText: 'Count 0' };
-}
+import C3React from '@/components/c3react.ts';
+import Button from '@/components/button.ts';
 
 export class MainLayout extends Layout {
-    readonly box = new Box('box', getInitialText);
-
-    constructor() {
-        super('main');
-    }
+    private readonly c3react = new C3React();
+    private readonly button = new Button('c3react');
 
     protected override onStart = () => {
-        let count = 0;
+        const onClicked = () => {
+            this.c3react.play();
 
-        setInterval(() => {
-            this.box.text = `Count ${count}`;
-            this.box.update();
-            count++;
-        }, 1000);
+            this.button.setState({
+                color: [
+                    utils.random(0, 255),
+                    utils.random(0, 255),
+                    utils.random(0, 255)
+                ]
+            })
+        };
+
+        this.button.setState({
+            label: 'C3React :>',
+            color: [0, 225, 199],
+            onClicked,
+        });
     };
 }
+
+const layout = new MainLayout('main');
+export default layout;
