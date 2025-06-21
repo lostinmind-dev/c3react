@@ -11,14 +11,16 @@ export {
     Modal,
 
     useState,
+
     useChild,
     useChildren,
-    useInst,
-    useInsts,
+    useObject,
+    useObjects,
+
     useTouched,
     useMouseOver,
 
-    createInst,
     utils,
 } from './lib/core.ts';
+
 export default app;

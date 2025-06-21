@@ -1,4 +1,4 @@
-import { EventsHandler } from '../events-handler.ts';
+import { EventsHandler } from '../utils/events-handler.ts';
 
 class State<V> extends EventsHandler<{
     'update': { prevValue?: V },

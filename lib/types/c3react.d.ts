@@ -124,16 +124,6 @@ declare global {
             type Key = keyof Keys | `Key${Uppercase<Chars[number]>}`;
         }
 
-        type ArrayJson<C extends unknown[]> = {
-            c2array: true,
-            size: [width: number, height: number, depth: number],
-            data: {
-                [RowIndex in keyof any[]]: {
-                    [ColIndex in keyof C]: [C[ColIndex]];
-                }
-            },
-        }
-
         type Position = { x: number; y: number };
         type Size = { width: number; height: number };
     }

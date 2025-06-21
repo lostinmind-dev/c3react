@@ -1,5 +1,5 @@
 import { app } from '../app.ts';
-import { EventsHandler } from '../events-handler.ts';
+import { EventsHandler } from '../utils/events-handler.ts';
 
 export class C3ReactKeyboard extends EventsHandler<{
     'down': KeyboardEvent;

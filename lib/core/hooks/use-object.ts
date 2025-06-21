@@ -1,6 +1,9 @@
-import { ExtractObjectInstType } from '../component.ts';
+import type { ExtractObjectInstType } from '../component.ts';
 
-export function useObject<N extends keyof IConstructProjectObjects>(name: N, pickBy?: (instance: ExtractObjectInstType<N>) => boolean) {
+export function useObject<N extends keyof IConstructProjectObjects>(
+    name: N,
+    pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
+) {
     let instance: ExtractObjectInstType<N> | undefined;
 
     const object = runtime.objects[name];
@@ -23,4 +26,25 @@ export function useObject<N extends keyof IConstructProjectObjects>(name: N, pic
     if (!instance) throw new Error(`No any instance was found`);
 
     return instance;
+}
+
+export function useObjects<N extends keyof IConstructProjectObjects>(
+    name: N,
+    pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
+) {
+
+    let instances: ExtractObjectInstType<N>[] = [];
+
+    const object = runtime.objects[name];
+
+    //@ts-ignore;
+    instances = object.instances().filter((i) =>
+        i.objectType.name === name
+    ).toArray();
+
+    if (pickBy) {
+        instances = instances.filter((i) => pickBy(i));
+    }
+
+    return instances;
 }

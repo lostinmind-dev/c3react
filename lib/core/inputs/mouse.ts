@@ -1,5 +1,5 @@
 import { app } from '../app.ts';
-import { EventsHandler } from '../events-handler.ts';
+import { EventsHandler } from '../utils/events-handler.ts';
 
 const BUTTONS: C3React.Mouse.Buttons = {
     left: 0,

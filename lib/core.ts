@@ -8,18 +8,16 @@ export { mouse } from './core/inputs/mouse.ts';
 
 export { app } from './core/app.ts';
 export { Layout } from './core/layout.ts';
-export { EventsHandler } from './core/events-handler.ts';
 export { Component } from './core/component.ts';
 export { Modal } from './core/modal.ts';
-export * as utils from './core/utils.ts';
+
+/** Utils */
+export { EventsHandler } from './core/utils/events-handler.ts';
+export * as utils from './core/utils/index.ts';
 
 /** Hooks */
 export { useState } from './core/hooks/use-state.ts';
-export { useChild } from './core/hooks/use-child.ts';
-export { useChildren } from './core/hooks/use-children.ts';
-export { useInst } from './core/hooks/use-inst.ts';
-export { useInsts } from './core/hooks/use-insts.ts';
-export { createInst } from './core/hooks/create-inst.ts';
-
+export { useChild, useChildren } from './core/hooks/use-child.ts';
+export { useObject, useObjects } from './core/hooks/use-object.ts';
 export { useMouseOver } from './core/hooks/use-mouse-over.ts';
 export { useTouched } from './core/hooks/use-touched.ts';

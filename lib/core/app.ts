@@ -1,43 +1,24 @@
+import type { Handler } from './utils/events-handler.ts';
 import type { Layout } from './layout.ts';
 
-type InitOptions = Readonly<{
-    layouts: Layout[];
-    beforeStart: () => void | Promise<void>;
-}>;
+class App {
+    private readonly events = new Map<keyof RuntimeEventMap, Set<Handler>>();
+    private readonly cachedSubscribers = new Set<() => void>();
+    private isInited: boolean = false;
 
-type EventHandler<Data = any> = (data: Data) => void;
-
-export abstract class app {
-    private static readonly events = new Map<keyof RuntimeEventMap, Set<EventHandler>>();
-    private static readonly cachedSubscribers = new Set<() => void>();
-    private static isInited: boolean = false;
-
-    private static globalize(runtime: IRuntime) {
-        //@ts-ignore @GLOBAL
-        globalThis.runtime = runtime;
-    }
-
-    static async addScript(url: string) {
-        return new Promise<void>((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
-
-            script.onload = () => resolve();
-            script.onerror = reject;
-
-            document.head.appendChild(script);
-        });
-    }
-
-    static init(opts: InitOptions) {
+    init(opts: {
+        layouts: Layout[];
+        beforeStart: () => void | Promise<void>;
+    }) {
         if (this.isInited) return;
 
-        app.on('afteranylayoutend', () => this.cachedSubscribers.forEach(unsubscribe => unsubscribe()));
+        this.on('afteranylayoutend', () => this.cachedSubscribers.forEach(unsubscribe => unsubscribe()));
 
         runOnStartup(async (runtime) => {
             this.isInited = true;
 
-            this.globalize(runtime);
+            //@ts-ignore @GLOBAL
+            globalThis.runtime = runtime;
 
             for (const [event, handlers] of this.events) {
                 handlers.forEach((handler) =>
@@ -49,10 +30,11 @@ export abstract class app {
         });
     }
 
-    /** Cached callback, will be unsubscribed after any layout end */
-    static onCached<Event extends keyof RuntimeEventMap>(
+    /** Returns method for unsubscribing from event */
+    on<Event extends keyof RuntimeEventMap>(
         event: Event,
-        handler: EventHandler<RuntimeEventMap[Event]>,
+        handler: Handler<RuntimeEventMap[Event]>,
+        isCached?: true,
     ) {
         let handlers = this.events.get(event);
 
@@ -69,37 +51,23 @@ export abstract class app {
             handlers.delete(handler);
         }
 
-        this.cachedSubscribers.add(unsubscribe);
+        if (isCached) this.cachedSubscribers.add(unsubscribe);
+
+        return unsubscribe;
     }
 
-    /** Returns method for unsubscribing from event */
-    static on<Event extends keyof RuntimeEventMap>(
-        event: Event,
-        handler: EventHandler<RuntimeEventMap[Event]>,
-    ) {
-        let handlers = this.events.get(event);
+    async addScript(url: string) {
+        return new Promise<void>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = url;
 
-        if (!handlers) {
-            this.events.set(event, new Set());
-            handlers = this.events.get(event)!;
-        }
+            script.onload = () => resolve();
+            script.onerror = reject;
 
-        handlers.add(handler);
-        if (typeof runtime !== 'undefined') runtime.addEventListener(event, handler);
-
-        return () => {
-            runtime.removeEventListener(event, handler);
-            handlers.delete(handler);
-        }
+            document.head.appendChild(script);
+        });
     }
 
-    // static release(): void {
-    //     for (const [event, handlers] of this.events) {
-    //         for (const handler of handlers) {
-    //             runtime.removeEventListener(event, handler);
-    //         }
-    //     }
-
-    //     this.events.clear();
-    // }
 }
+
+export const app = new App();

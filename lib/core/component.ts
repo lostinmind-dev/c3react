@@ -1,6 +1,6 @@
 import { app } from './app.ts';
 import { Collection } from './collection.ts';
-import { createInst } from './hooks/create-inst.ts';
+import { createObject } from './utils/index.ts';
 
 export type ExtractObjectInstType<N extends keyof IConstructProjectObjects> =
     NonNullable<
@@ -9,16 +9,16 @@ export type ExtractObjectInstType<N extends keyof IConstructProjectObjects> =
         >
     >;
 
-export function pickInst<N extends keyof IConstructProjectObjects>(
-    objectName: N,
-    condition?: (inst: ExtractObjectInstType<N>) => boolean,
+function useObject<N extends keyof IConstructProjectObjects>(
+    name: N,
+    pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
 ) {
-    const object = runtime.objects[objectName];
+    const object = runtime.objects[name];
     let instance: ExtractObjectInstType<N> | undefined;
 
-    if (condition) {
+    if (pickBy) {
         //@ts-ignore;
-        instance = object.instances().find((i) => condition(i));
+        instance = object.instances().find((i) => pickBy(i));
 
         return instance;
     }
@@ -50,9 +50,9 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
 
             let component: Component;
             for (component of filteredComponents) {
-                const pickedInstance = pickInst(
+                const pickedInstance = useObject(
                     component.objectName,
-                    component.pickCondition,
+                    component.pickBy,
                 );
 
                 if (instance !== pickedInstance) continue;
@@ -114,7 +114,7 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
 
     constructor(
         private readonly objectName?: N,
-        private readonly pickCondition?: (inst: ExtractObjectInstType<N>) => boolean,
+        private readonly pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
     ) {
         components.add(this);
     }
@@ -159,10 +159,10 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
     /** Triggers when ROOT instance was destroyed */
     protected onRootDestroyed() { };
 
-    public createRoot(opts?: Parameters<typeof createInst>[1]) {
+    public createRoot(opts?: Parameters<typeof createObject>[1]) {
         if (!this.objectName) return;
 
-        this.root = createInst(this.objectName, opts)
+        this.root = createObject(this.objectName, opts);
     }
 
     public destroyRoot() {
