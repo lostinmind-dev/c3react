@@ -59,6 +59,10 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
 
                 component.#isDestroyed = false;
                 component.root = pickedInstance;
+
+                if (pickedInstance.allChildren().toArray().length === 0) {
+                    component.onRootReady();
+                }
             }
         });
 
@@ -120,9 +124,9 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
      */
     protected getRoot() {
         if (!this.root) {
-            if (!this.objectName) {
-                throw new Error(`Can't use root instance NOT visual component`);
-            }
+            // if (!this.objectName) {
+            //     throw new Error(`Can't use root instance NOT visual component`);
+            // }
             throw new Error(`Root instance was NOT defined yet`);
         }
 
@@ -138,7 +142,7 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
      * For example modifying *instance.instVars* for success condition in component class
      */
     protected setRoot(root: ExtractObjectInstType<N>) {
-        if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
+        // if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
 
         this.root = root;
         this.onRootReady();

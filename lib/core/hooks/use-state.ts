@@ -1,7 +1,7 @@
 import { EventsHandler } from '../events-handler.ts';
 
 class State<V> extends EventsHandler<{
-    'update': void,
+    'update': { prevValue?: V },
 }> {
     constructor(private value: V) {
         super();
@@ -12,8 +12,20 @@ class State<V> extends EventsHandler<{
     }
 
     setValue(value: V) {
+        let prevValue: V | undefined;
+
+        if (
+            typeof this.value === 'number' ||
+            typeof this.value === 'string' ||
+            typeof this.value === 'boolean'
+        ) {
+            prevValue = this.value;
+        } else {
+            prevValue = undefined
+        }
+
         this.value = value;
-        this.emit('update');
+        this.emit('update', { prevValue });
     }
 }
 

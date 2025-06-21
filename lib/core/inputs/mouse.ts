@@ -168,7 +168,8 @@ export class C3ReactMouse extends EventsHandler<{
     }
 
     getCoords<T extends keyof typeof this.coordinates>(type: T) {
-        return this.coordinates[type];
+        const {x, y}= this.coordinates[type];
+        return [x, y] as const;
     }
 
     protected override release(): void {

@@ -19,5 +19,7 @@ export { useChild } from './core/hooks/use-child.ts';
 export { useChildren } from './core/hooks/use-children.ts';
 export { useInst } from './core/hooks/use-inst.ts';
 export { useInsts } from './core/hooks/use-insts.ts';
-export { useTouched } from './core/hooks/use-touched.ts';
 export { createInst } from './core/hooks/create-inst.ts';
+
+export { useMouseOver } from './core/hooks/use-mouse-over.ts';
+export { useTouched } from './core/hooks/use-touched.ts';

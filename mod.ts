@@ -16,6 +16,7 @@ export {
     useInst,
     useInsts,
     useTouched,
+    useMouseOver,
 
     createInst,
     utils,
