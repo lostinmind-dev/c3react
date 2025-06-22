@@ -10,7 +10,7 @@ export function useObject<N extends keyof IConstructProjectObjects>(
 
     if (pickBy) {
         //@ts-ignore;
-        instance = object.instances().find((i) => condition(i));
+        instance = object.instances().find((i) => pickBy(i));
 
         if (!instance) {
             throw new Error(

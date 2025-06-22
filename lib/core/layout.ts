@@ -1,5 +1,5 @@
 import { app } from './app.ts';
-import { Collection } from './collection.ts';
+import { Collection } from './utils/collection.ts';
 
 const layouts = new Collection<Layout>();
 

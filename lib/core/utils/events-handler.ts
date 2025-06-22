@@ -17,6 +17,10 @@ export class EventsHandler<
         }
 
         handlers.add(handler);
+
+        return () => {
+            handlers.delete(handler);
+        }
     }
 
     protected emit<Event extends keyof Events>(

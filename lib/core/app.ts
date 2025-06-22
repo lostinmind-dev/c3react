@@ -1,5 +1,6 @@
 import type { Handler } from './utils/events-handler.ts';
 import type { Layout } from './layout.ts';
+import { initDevTools } from './dev-tools.ts';
 
 class App {
     private readonly events = new Map<keyof RuntimeEventMap, Set<Handler>>();
@@ -7,10 +8,13 @@ class App {
     private isInited: boolean = false;
 
     init(opts: {
+        devTools?: true,
         layouts: Layout[];
         beforeStart: () => void | Promise<void>;
     }) {
         if (this.isInited) return;
+
+        if (opts.devTools) initDevTools();
 
         this.on('afteranylayoutend', () => this.cachedSubscribers.forEach(unsubscribe => unsubscribe()));
 

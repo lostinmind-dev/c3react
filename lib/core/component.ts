@@ -1,6 +1,6 @@
+import type { Handler } from './utils/events-handler.ts';
 import { app } from './app.ts';
-import { Collection } from './collection.ts';
-import { createObject } from './utils/index.ts';
+import { Collection } from './utils/collection.ts';
 
 export type ExtractObjectInstType<N extends keyof IConstructProjectObjects> =
     NonNullable<
@@ -37,13 +37,14 @@ export const components = new Collection<Component>();
  * get/set without public/protected are for using BOTH inside AND outside component
  */
 
-export abstract class Component<N extends keyof IConstructProjectObjects = any>{
+export abstract class Component<S extends object = any, N extends keyof IConstructProjectObjects = any> {
     private static initsCount: number = 0;
 
     static init() {
         if (this.initsCount > 0) return;
 
         app.on('instancecreate', ({ instance }) => {
+            // console.log('INSTANCE READY UID:', instance.uid)
             const filteredComponents = components.toArray().filter((c) =>
                 c.objectName === instance.objectType.name
             );
@@ -60,25 +61,25 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
                 component.#isDestroyed = false;
                 component.root = pickedInstance;
 
-                if (pickedInstance.allChildren().toArray().length === 0) {
-                    component.onRootReady();
-                }
+                component.onReady();
             }
         });
 
         app.on('hierarchyready', ({ instance }) => {
-            const component = components.toArray().find((c) =>
-                c.root === instance
+            // console.log('HIERARCHY READY UID:', instance.uid, instance)
+            const filteredComponents = components.toArray().filter((c) =>
+                c.root && c.root.uid === instance.uid
             );
-            if (component) component.onRootReady();
+
+            filteredComponents.forEach(c => c.onHierarchyReady());
         });
 
         app.on('instancedestroy', ({ instance }) => {
             const component = components.toArray().find((c) => c.root === instance);
             if (component) {
                 component.#isDestroyed = true;
-                component.onRootDestroyed();
-                component.root = undefined;
+                component.onDestroyed();
+                // component.root = undefined;
                 if (component.isCached) components.delete(component);
             }
         });
@@ -91,7 +92,9 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
         this.initsCount++;
     }
 
+    private readonly onChangedEvents = new Map<string, Set<Handler>>();
     private root?: ExtractObjectInstType<N>;
+    private state: S;
 
     #isDestroyed: boolean = false;
 
@@ -102,51 +105,51 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
     /**
      * Cached components will be deleted from global collection after any layout end
      */
-    #isCached: boolean = false;
-
-    protected get isCached() {
-        return this.#isCached;
-    }
-
-    protected set isCached(v: boolean) {
-        this.#isCached = v;
-    }
+    protected isCached: boolean = false;
 
     constructor(
+        initialState: S,
         private readonly objectName?: N,
         private readonly pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
     ) {
+        this.state = initialState;
         components.add(this);
+
+        if (typeof runtime !== 'undefined' && objectName) {
+            const root = useObject(objectName, pickBy);
+
+            if (root) {
+                this.root = root;
+                this.onReady();
+
+                root.addEventListener('hierarchyready', () => this.onHierarchyReady());
+            }
+        }
     }
 
     /**
      * Returns ROOT instance of component that was found by provided "objectName" & optional "pickCondition" in constructor
      */
     protected getRoot() {
-        if (!this.root) {
-            // if (!this.objectName) {
-            //     throw new Error(`Can't use root instance NOT visual component`);
-            // }
-            throw new Error(`Root instance was NOT defined yet`);
-        }
+        if (!this.root) throw new Error(`Root instance was NOT defined yet`);
 
         return this.root;
     }
 
-    /** 
-     * It will set ROOT instance only if it's undefined
-     * In other cases you will get an error
-     * Also it will call onReady() method
-     * @description 
-     * Use this method for cases when you creating instance, setting up properties 
-     * For example modifying *instance.instVars* for success condition in component class
-     */
-    protected setRoot(root: ExtractObjectInstType<N>) {
-        // if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
+    // /** 
+    //  * It will set ROOT instance only if it's undefined
+    //  * In other cases you will get an error
+    //  * Also it will call onReady() method
+    //  * @description 
+    //  * Use this method for cases when you creating instance, setting up properties 
+    //  * For example modifying *instance.instVars* for success condition in component class
+    //  */
+    // protected setRoot(root: ExtractObjectInstType<N>) {
+    //     // if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
 
-        this.root = root;
-        this.onRootReady();
-    }
+    //     this.root = root;
+    //     this.onReady();
+    // }
 
     /**
      * Triggers when C3 "hieararchyready" event was detected on this component
@@ -154,19 +157,41 @@ export abstract class Component<N extends keyof IConstructProjectObjects = any>{
      * Runtime Events
      * @see https://www.construct.net/en/make-games/manuals/construct-3/scripting/scripting-reference/iruntime#internalH1Link1
      */
-    protected onRootReady() { };
+    protected onReady() { };
+
+    protected onHierarchyReady() { };
 
     /** Triggers when ROOT instance was destroyed */
-    protected onRootDestroyed() { };
+    protected onDestroyed() { };
 
-    public createRoot(opts?: Parameters<typeof createObject>[1]) {
-        if (!this.objectName) return;
+    protected onChanged<K extends string & keyof S>(key: K, handler: Handler<S[K]>) {
+        let handlers = this.onChangedEvents.get(key);
 
-        this.root = createObject(this.objectName, opts);
+        if (!handlers) {
+            this.onChangedEvents.set(key, new Set());
+            handlers = this.onChangedEvents.get(key)!;
+        }
+
+        handlers.add(handler);
+    }
+
+    public getState() {
+        return this.state;
+    }
+
+    public change<K extends string & keyof S>(key: K, value: S[K]) {
+        const handlers = this.onChangedEvents.get(key);
+
+        if (handlers) handlers.forEach(handler => handler(this.state[key]));
+        
+        this.state[key] = value;
     }
 
     public destroyRoot() {
-        if (this.isDestroyed || !this.root) return;
+        if (this.isDestroyed || !this.root) {
+            components.delete(this);
+            return;
+        };
 
         this.root.destroy();
     }

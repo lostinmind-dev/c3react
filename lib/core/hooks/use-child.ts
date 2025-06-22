@@ -13,7 +13,7 @@ export function useChild<
 >(
     instance: IWorldInstance | (() => IWorldInstance),
     objectName: N,
-    condition?: (inst: I) => boolean,
+    pickBy?: (inst: I) => boolean,
 ) {
     let children: I[];
     let child: I | undefined;
@@ -29,8 +29,8 @@ export function useChild<
             ).toArray() as I[];
         }
 
-        if (condition) {
-            child = children.find((i) => condition(i));
+        if (pickBy) {
+            child = children.find((i) => pickBy(i));
 
             if (!child) throw new Error('Child NOT found by condition');
 
@@ -52,7 +52,7 @@ export function useChildren<
 >(
     instance: IWorldInstance | (() => IWorldInstance),
     objectName: N,
-    condition?: (inst: I) => boolean,
+    pickBy?: (inst: I) => boolean,
 ) {
     let children: I[] = [];
 
@@ -67,8 +67,8 @@ export function useChildren<
             ).toArray() as I[];
         }
 
-        if (condition) {
-            children = children.filter((i) => condition(i));
+        if (pickBy) {
+            children = children.filter((i) => pickBy(i));
 
             return children;
         }

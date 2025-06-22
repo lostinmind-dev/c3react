@@ -16,8 +16,6 @@ export { EventsHandler } from './core/utils/events-handler.ts';
 export * as utils from './core/utils/index.ts';
 
 /** Hooks */
-export { useState } from './core/hooks/use-state.ts';
 export { useChild, useChildren } from './core/hooks/use-child.ts';
 export { useObject, useObjects } from './core/hooks/use-object.ts';
-export { useMouseOver } from './core/hooks/use-mouse-over.ts';
 export { useTouched } from './core/hooks/use-touched.ts';

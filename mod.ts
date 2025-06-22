@@ -10,15 +10,12 @@ export {
     Layout,
     Modal,
 
-    useState,
-
     useChild,
     useChildren,
     useObject,
     useObjects,
 
     useTouched,
-    useMouseOver,
 
     utils,
 } from './lib/core.ts';

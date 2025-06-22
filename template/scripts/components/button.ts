@@ -1,51 +1,60 @@
-import { Component, useChild, useTouched, utils, useState } from 'c3react';
+import { Component, useChild, useTouched, utils } from 'c3react';
 import gsap from 'gsap';
 
-export default class Button extends Component<'button'> {
-    private readonly useLabel = useChild(() => this.getRoot(), 'text');
+export default class Button extends Component<{
+    label: string,
+    onClicked?: (btn: Button) => void,
+    color: Vec3Arr,
+    reduceFactor: number,
+}, 'button'> {
+    private readonly getLabel = useChild(() => this.getRoot(), 'text');
 
-    readonly label = useState('C3React');
-    readonly onClickedHandler = useState<() => void>(() => {});
-    readonly color = useState<Vec3Arr>([148, 169, 184]);
-
-    private readonly initialSize = useState<C3React.Size>({
+    private initialSize: C3React.Size = {
         width: 0,
         height: 0,
-    });
+    };
 
-    constructor(id: 'c3react') {
-        super('button', (i) => i.instVars.id === id);
-    }
-
-    protected override onRootReady() {
-        const { width, height } = this.getRoot();
-        this.initialSize.setValue({ width, height });
-
-        this.updateText();
-        this.updateColor();
+    constructor(id: string, label: string, onClicked?: (btn: Button) => void) {
+        super({
+            label,
+            color: [148, 169, 184],
+            onClicked,
+            reduceFactor: 1.1,
+        },
+            'button',
+            (i) => i.instVars.id === id
+        );
 
         useTouched(() => this.getRoot(), (type) => {
             switch (type) {
                 case 'start': { this.animateIn(); } break;
                 case 'end': {
-                    const onClicked = this.onClickedHandler.getValue();
+                    const { onClicked } = this.getState();
                     this.animateOut();
-                    onClicked();
+                    onClicked?.(this);
                 } break;
             }
         });
 
-        this.label.on('update', () => this.updateText());
-        this.color.on('update', () => this.updateColor());
+        this.onChanged('label', () => this.updateText());
+        this.onChanged('color', () => this.updateColor());
+    }
+
+    protected onReady() {
+        const { width, height } = this.getRoot();
+        this.initialSize = { width, height };
+
+        this.updateText();
+        this.updateColor();
     }
 
     private updateText() {
-        const label = this.label.getValue();
-        this.useLabel().text = label;
+        const { label } = this.getState();
+        this.getLabel().text = label;
     }
 
     private updateColor() {
-        const color = this.color.getValue();
+        const { color } = this.getState();
         const root = this.getRoot();
 
         const [r, g, b] = root.colorRgb;
@@ -65,11 +74,12 @@ export default class Button extends Component<'button'> {
     }
 
     private animateIn() {
-        const { width,height } = this.initialSize.getValue();
+        const { width, height } = this.initialSize;
+        const { reduceFactor } = this.getState();
 
         gsap.to(this.getRoot(), {
-            width: width / 1.2,
-            height: height / 1.2,
+            width: width / reduceFactor,
+            height: height / reduceFactor,
 
             duration: 0.2,
             ease: 'power4.out',
@@ -78,7 +88,7 @@ export default class Button extends Component<'button'> {
     }
 
     private animateOut() {
-        const { width, height } = this.initialSize.getValue();
+        const { width, height } = this.initialSize;
 
         gsap.to(this.getRoot(), {
             width,

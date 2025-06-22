@@ -26,6 +26,20 @@
 			"name": "Tiled Background",
 			"author": "Scirra",
 			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "Anchor",
+			"name": "Anchor",
+			"author": "Scirra",
+			"bundled": false
+		},
+		{
+			"type": "behavior",
+			"id": "DragnDrop",
+			"name": "Drag & Drop",
+			"author": "Scirra",
+			"bundled": false
 		}
 	],
 	"uniqueId": "81ojjthy0d9",
@@ -33,7 +47,8 @@
 		"items": [
 			"c3react",
 			"button",
-			"text"
+			"text",
+			"TiledBackground"
 		],
 		"subfolders": []
 	},

@@ -86,38 +86,6 @@ export class C3ReactPointer extends EventsHandler<{
         this.isInited = true;
     }
 
-    onTouched<I extends IWorldInstance>(instance: I, handler: (type: 'start' | 'end') => void) {
-        const isCoordsOverBBox = (bbox: DOMRect, x: number, y: number) => {
-            return (
-                x > bbox.left &&
-                x < bbox.right &&
-                y > bbox.top &&
-                y < bbox.bottom
-            );
-        }
-        const checkTouched = <I extends IWorldInstance>(instance: I) => {
-            const layer = instance.layer;
-            if (!layer.isInteractive) return false;
-
-            const [x, y] = pointer.getCoords('current');
-            const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
-
-            return isCoordsOverBBox(
-                instance.getBoundingBox(),
-                translatedX,
-                translatedY,
-            );
-        }
-
-        this.on('down', () => {
-            if (checkTouched(instance)) handler('start');
-        });
-
-        this.on('up', () => {
-            if (checkTouched(instance)) handler('end');
-        });
-    }
-
     getCoords<T extends keyof typeof this.coordinates>(type: T) {
         const { x, y } = this.coordinates[type];
         return [x, y] as const;

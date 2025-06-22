@@ -1,39 +1,27 @@
+
 import { pointer } from '../inputs/pointer.ts';
-
-export function isCoordsOverBBox(bbox: DOMRect, x: number, y: number) {
-    return (
-        x > bbox.left &&
-        x < bbox.right &&
-        y > bbox.top &&
-        y < bbox.bottom
-    );
-}
-
-function checkTouched<I extends IWorldInstance>(instance: I) {
-    const layer = instance.layer;
-    if (!layer.isInteractive) return false;
-
-    const [x, y] = pointer.getCoords('current');
-    const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
-
-    return isCoordsOverBBox(
-        instance.getBoundingBox(),
-        translatedX,
-        translatedY,
-    );
-}
+import { checkTouched } from '../utils/index.ts';
 
 export function useTouched<I extends IWorldInstance>(
     instance: I | (() => I),
     handler: (type: 'start' | 'end') => void,
 ) {
-    if (typeof instance === 'function') instance = instance();
+    const inst = (typeof instance === 'function')
+        ? instance()
+        : instance
+    ;
 
-    pointer.on('down', () => {
-        if (checkTouched(instance)) handler('start');
-    });
+    const subscribers = [
+        pointer.on('down', () => {
+            if (checkTouched(inst)) handler('start');
+        }),
+    
+        pointer.on('up', () => {
+            if (checkTouched(inst)) handler('end');
+        }),
+    ]
 
-    pointer.on('up', () => {
-        if (checkTouched(instance)) handler('end');
-    });
+    inst.addEventListener('destroy', () => {
+        subscribers.forEach(unsubscribe => unsubscribe());
+    })
 }

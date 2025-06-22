@@ -1,4 +1,5 @@
 import type { ExtractObjectInstType } from '../component.ts';
+import { pointer } from '../inputs/pointer.ts';
 
 export function choose(...numbers: number[]) {
     const index = Math.floor(Math.random() * numbers.length);
@@ -65,4 +66,27 @@ export function createObjects<N extends keyof IConstructProjectObjects>(
     }
 
     return instances;
+}
+
+export function isCoordsOverBBox(bbox: DOMRect, x: number, y: number) {
+    return (
+        x > bbox.left &&
+        x < bbox.right &&
+        y > bbox.top &&
+        y < bbox.bottom
+    );
+}
+
+export function checkTouched(instance: IWorldInstance) {
+    const layer = instance.layer;
+    if (!layer.isInteractive) return false;
+
+    const [x, y] = pointer.getCoords('current');
+    const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
+
+    return isCoordsOverBBox(
+        instance.getBoundingBox(),
+        translatedX,
+        translatedY,
+    );
 }

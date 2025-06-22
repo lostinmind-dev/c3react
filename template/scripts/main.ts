@@ -6,13 +6,13 @@ import mainLayout from '@/layouts/main.layout.ts';
 pointer.init();
 
 app.init({
+    devTools: true,
     layouts: [
         /** Initialize layouts here... */
         mainLayout
     ],
     beforeStart: async () => {
         /** Do someting it's like runOnStartup() inside block  */
-        console.log('Before start!')
     },
 });
 

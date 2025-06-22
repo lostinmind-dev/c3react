@@ -3,6 +3,7 @@
     "name": "@c3react/template",
     "version": "1.0.0",
     "compilerOptions": {
+        "noImplicitOverride": false,
         "types": [
             "./ts-defs.d.ts"
         ],
