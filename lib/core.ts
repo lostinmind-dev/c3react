@@ -16,6 +16,10 @@ export { EventsHandler } from './core/utils/events-handler.ts';
 export * as utils from './core/utils/index.ts';
 
 /** Hooks */
+export { useComponent } from './core/hooks/use-component.ts';
+export { useParent } from './core/hooks/use-parent.ts';
 export { useChild, useChildren } from './core/hooks/use-child.ts';
 export { useObject, useObjects } from './core/hooks/use-object.ts';
+export { useEffect } from './core/hooks/use-effect.ts';
+
 export { useTouched } from './core/hooks/use-touched.ts';

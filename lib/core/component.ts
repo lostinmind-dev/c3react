@@ -37,7 +37,10 @@ export const components = new Collection<Component>();
  * get/set without public/protected are for using BOTH inside AND outside component
  */
 
-export abstract class Component<S extends object = any, N extends keyof IConstructProjectObjects = any> {
+export abstract class Component<
+    S extends object = any,
+    N extends keyof IConstructProjectObjects = any
+> {
     private static initsCount: number = 0;
 
     static init() {
@@ -80,7 +83,10 @@ export abstract class Component<S extends object = any, N extends keyof IConstru
                 component.#isDestroyed = true;
                 component.onDestroyed();
                 // component.root = undefined;
-                if (component.isCached) components.delete(component);
+                if (component.isCached) {
+                    component.onChangedEvents.clear();
+                    components.delete(component);
+                };
             }
         });
 
@@ -100,6 +106,10 @@ export abstract class Component<S extends object = any, N extends keyof IConstru
 
     get isDestroyed() {
         return this.#isDestroyed;
+    }
+
+    protected get isReady() {
+        return typeof this.root !== 'undefined'; 
     }
 
     /**
@@ -136,21 +146,6 @@ export abstract class Component<S extends object = any, N extends keyof IConstru
         return this.root;
     }
 
-    // /** 
-    //  * It will set ROOT instance only if it's undefined
-    //  * In other cases you will get an error
-    //  * Also it will call onReady() method
-    //  * @description 
-    //  * Use this method for cases when you creating instance, setting up properties 
-    //  * For example modifying *instance.instVars* for success condition in component class
-    //  */
-    // protected setRoot(root: ExtractObjectInstType<N>) {
-    //     // if (this.root) throw new Error(`Can't set ROOT instance, it was already defined before!`);
-
-    //     this.root = root;
-    //     this.onReady();
-    // }
-
     /**
      * Triggers when C3 "hieararchyready" event was detected on this component
      * - - -
@@ -183,7 +178,7 @@ export abstract class Component<S extends object = any, N extends keyof IConstru
         const handlers = this.onChangedEvents.get(key);
 
         if (handlers) handlers.forEach(handler => handler(this.state[key]));
-        
+
         this.state[key] = value;
     }
 

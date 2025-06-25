@@ -15,10 +15,11 @@ export function createConfig(watch?: true) {
                     format: 'esm',
                     entryFileNames: 'main.js',
                 },
+                treeshake: 'recommended',
             },
             outDir: 'project/scripts',
             emptyOutDir: false,
-            sourcemap: 'inline',
+            sourcemap: (watch) ? 'inline' : false,
             target: 'es2022',
         },
         resolve: {

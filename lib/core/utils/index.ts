@@ -1,6 +1,10 @@
 import type { ExtractObjectInstType } from '../component.ts';
 import { pointer } from '../inputs/pointer.ts';
 
+export function wait(seconds: number) {
+    return new Promise<void>((resolve) => setTimeout(() => resolve(), seconds * 1000));
+}
+
 export function choose(...numbers: number[]) {
     const index = Math.floor(Math.random() * numbers.length);
     return numbers[index];
@@ -89,4 +93,22 @@ export function checkTouched(instance: IWorldInstance) {
         translatedX,
         translatedY,
     );
+}
+
+export async function addScript(url: string, opts ?: {
+    async?: true,
+    module?: true,
+}) {
+    return new Promise<void>((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = url;
+
+        script.onload = () => resolve();
+        script.onerror = reject;
+
+        if (opts?.async) script.async = true;
+        if (opts?.module) script.type = 'module';
+
+        document.head.appendChild(script);
+    });
 }

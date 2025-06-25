@@ -1,11 +1,41 @@
 import { parseArgs } from 'jsr:@std/cli/parse-args';
+import chalk from 'npm:chalk';
 
 /** Commands */
 import { bundleDts } from './cli/bundle-dts.ts';
 import { build } from './cli/build.ts';
+import { create } from './cli/create.ts';
+
+function printHelp() {
+    console.log(`
+        ${chalk.bold.cyan('C3React CLI Tool')}
+        ${chalk.gray('Usage:')} ${chalk.green('c3react')} ${chalk.yellow('<command>')} [options]
+        
+        ${chalk.bold('Available commands:')}
+        
+        ${chalk.yellow('create')}          ${chalk.white('Create empty project')}
+        ${chalk.yellow('dev')}             ${chalk.white('Start development mode')}
+        ${chalk.yellow('build')}           ${chalk.white('Build the project')}
+        ${chalk.yellow('bundledts')}       ${chalk.white('Bundle all C3 .d.ts into "ts-defs.d.ts"')}
+        ${chalk.yellow('help')}            ${chalk.white('Show this help message')}
+        `);
+        // ${chalk.yellow('version')}         ${chalk.white('Show CLI version')}
+        // ${chalk.bold('Options:')}
+        
+        // ${chalk.cyan('--verbose')}         ${chalk.white('Enable verbose output')}
+        // ${chalk.cyan('--config')}          ${chalk.white('Path to custom config file')}
+        // ${chalk.bold('Examples:')}
+        
+        // ${chalk.gray('$')} ${chalk.green('mycli')} ${chalk.yellow('init')}
+        // ${chalk.gray('$')} ${chalk.green('mycli')} ${chalk.yellow('build')} --config ./config.json
+}
 
 async function main() {
     const args = parseArgs(Deno.args);
+
+    if (args._.includes('help')) {
+        return printHelp();
+    }
 
     if (args._.includes('bundledts')) {
         return await bundleDts();
@@ -19,7 +49,11 @@ async function main() {
         return await build(true);
     }
 
-    console.log(args);
+    if (args._.includes('create')) {
+        return await create();
+    }
+
+    return printHelp();
 }
 
 await main();

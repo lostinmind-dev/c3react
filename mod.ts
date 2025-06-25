@@ -10,10 +10,13 @@ export {
     Layout,
     Modal,
 
+    useComponent,
+    useParent,
     useChild,
     useChildren,
     useObject,
     useObjects,
+    useEffect,
 
     useTouched,
 

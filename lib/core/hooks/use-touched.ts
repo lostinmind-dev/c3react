@@ -19,8 +19,8 @@ export function useTouched<I extends IWorldInstance>(
         pointer.on('up', () => {
             if (checkTouched(inst)) handler('end');
         }),
-    ]
-
+    ];
+    
     inst.addEventListener('destroy', () => {
         subscribers.forEach(unsubscribe => unsubscribe());
     })

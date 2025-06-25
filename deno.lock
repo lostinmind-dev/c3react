@@ -4,6 +4,7 @@
     "jsr:@std/cli@*": "1.0.20",
     "jsr:@std/path@*": "1.1.0",
     "npm:@types/node@*": "22.15.15",
+    "npm:chalk@*": "5.4.1",
     "npm:v@*": "0.3.0",
     "npm:vi@*": "1.0.0",
     "npm:vit@*": "0.0.1",
@@ -260,6 +261,9 @@
       "dependencies": [
         "file-uri-to-path"
       ]
+    },
+    "chalk@5.4.1": {
+      "integrity": "sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w=="
     },
     "core-util-is@1.0.3": {
       "integrity": "sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ=="

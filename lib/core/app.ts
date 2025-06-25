@@ -2,10 +2,27 @@ import type { Handler } from './utils/events-handler.ts';
 import type { Layout } from './layout.ts';
 import { initDevTools } from './dev-tools.ts';
 
+type AppHandler = {
+    method: Handler;
+    cached: boolean,
+    once: boolean,
+    unsubscribe: () => void,
+}
+
 class App {
-    private readonly events = new Map<keyof RuntimeEventMap, Set<Handler>>();
-    private readonly cachedSubscribers = new Set<() => void>();
+    private readonly events = new Map<keyof RuntimeEventMap, Set<AppHandler>>();
     private isInited: boolean = false;
+
+    private addRuntimeEventListener(event: keyof RuntimeEventMap, appHandler: AppHandler) {
+        if (appHandler.once) {
+            runtime.addEventListener(event, (e) => {
+                appHandler.method(e);
+                appHandler.unsubscribe();
+            });
+        } else {
+            runtime.addEventListener(event, appHandler.method)
+        }
+    }
 
     init(opts: {
         devTools?: true,
@@ -16,7 +33,17 @@ class App {
 
         if (opts.devTools) initDevTools();
 
-        this.on('afteranylayoutend', () => this.cachedSubscribers.forEach(unsubscribe => unsubscribe()));
+        this.on('afteranylayoutend', () => {
+            const cachedHandlers = this.events
+                .values()
+                .toArray()
+                .map(handlers => handlers.values().toArray())
+                .flat()
+                .filter(handler => handler.cached)
+                ;
+
+            cachedHandlers.forEach(handler => handler.unsubscribe())
+        });
 
         runOnStartup(async (runtime) => {
             this.isInited = true;
@@ -24,10 +51,9 @@ class App {
             //@ts-ignore @GLOBAL
             globalThis.runtime = runtime;
 
-            for (const [event, handlers] of this.events) {
-                handlers.forEach((handler) =>
-                    runtime.addEventListener(event, handler)
-                );
+
+            for (const [event, appHandlers] of this.events) {
+                appHandlers.forEach(appHandler => this.addRuntimeEventListener(event, appHandler));
             }
 
             await opts.beforeStart?.();
@@ -38,7 +64,10 @@ class App {
     on<Event extends keyof RuntimeEventMap>(
         event: Event,
         handler: Handler<RuntimeEventMap[Event]>,
-        isCached?: true,
+        opts?: Partial<{
+            cached: true,
+            once: true,
+        }>
     ) {
         let handlers = this.events.get(event);
 
@@ -47,31 +76,24 @@ class App {
             handlers = this.events.get(event)!;
         }
 
-        handlers.add(handler);
-        if (typeof runtime !== 'undefined') runtime.addEventListener(event, handler);
-
         const unsubscribe = () => {
-            runtime.removeEventListener(event, handler);
-            handlers.delete(handler);
+            if (typeof runtime !== 'undefined') runtime.removeEventListener(event, handler);
+            handlers.delete(appHandler);
         }
 
-        if (isCached) this.cachedSubscribers.add(unsubscribe);
+        const appHandler: AppHandler = {
+            method: handler,
+            once: opts?.once || false,
+            cached: opts?.cached || false,
+            unsubscribe,
+        }
 
-        return unsubscribe;
+        handlers.add(appHandler);
+
+        if (typeof runtime !== 'undefined') this.addRuntimeEventListener(event, appHandler);
+
+        return appHandler;
     }
-
-    async addScript(url: string) {
-        return new Promise<void>((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = url;
-
-            script.onload = () => resolve();
-            script.onerror = reject;
-
-            document.head.appendChild(script);
-        });
-    }
-
 }
 
 export const app = new App();
