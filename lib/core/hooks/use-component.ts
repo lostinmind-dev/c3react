@@ -1,13 +1,20 @@
-import { Component } from '../component.ts';
+import { type Component, components } from '../component.ts';
 
-export function useComponent<C extends Component>(pickBy: (component: C) => boolean) {
-    return new Promise<C | null>((resolve) => {
-        import('../component.ts').then(module => {
-            const { components } = module;
+export function useComponent<T extends Component>(
+    componentClass: new (...args: any[]) => T,
+    pickBy?: (component: InstanceType<typeof componentClass>) => boolean,
+) {
+    let component: InstanceType<typeof componentClass>;
 
-            const component = components.toArray().find(c => pickBy(c as any));
+    return () => {
+        if (pickBy) {
+            //@ts-ignore;
+            component = components.toArray().find(c => pickBy(c))
+        } else {
+            //@ts-ignore;
+            component = components.toArray().find(c => c.constructor.name === componentKlass.name);
+        }
 
-            resolve((component as C) || null);
-        })
-    })
+        return component as InstanceType<typeof componentClass>;
+    }
 }

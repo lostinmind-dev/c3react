@@ -11,10 +11,19 @@ type AppHandler = {
     unsubscribe: () => void,
 }
 
-class App {
-    private readonly events = new Map<keyof RuntimeEventMap, Set<AppHandler>>();
+export class App {
+
+    static getLayout<T extends Layout>(app: App, layoutClass: new () => T) {
+        const layout = app.layouts.find(layout => layout.constructor.name === layoutClass.name)
+        if (!layout) throw new Error('Layout was not found!');
+        return layout as InstanceType<typeof layoutClass>;
+    }
+
     private isInited: boolean = false;
 
+    private readonly events = new Map<keyof RuntimeEventMap, Set<AppHandler>>();
+    private readonly layouts: Layout[] = [];
+    
     private addRuntimeEventListener(event: keyof RuntimeEventMap, appHandler: AppHandler) {
         if (appHandler.once) {
             runtime.addEventListener(event, (e) => {
@@ -28,10 +37,14 @@ class App {
 
     init(opts: {
         inputs?: ('keyboard' | 'mouse' | 'pointer')[],
-        layouts: Layout[] | readonly Layout[],
+        layouts: (new () => Layout)[], //| readonly Layout[],
         beforeStart: () => void | Promise<void>,
     }) {
         if (this.isInited) return;
+
+        for (const layout of opts.layouts) {
+            this.layouts.push(new layout());
+        }
 
         if (opts?.inputs) {
             const inputs = new Set(opts.inputs);

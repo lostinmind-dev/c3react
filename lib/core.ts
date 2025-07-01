@@ -9,13 +9,13 @@ export { mouse } from './core/inputs/mouse.ts';
 export { app } from './core/app.ts';
 export { Layout } from './core/layout.ts';
 export { Component, type ExtractObjectInstType } from './core/component.ts';
-export { Modal } from './core/modal.ts';
 
 /** Utils */
 export { EventsHandler } from './core/utils/events-handler.ts';
 export * as utils from './core/utils/index.ts';
 
 /** Hooks */
+export { useLayout } from './core/hooks/use-layout.ts';
 export { useComponent } from './core/hooks/use-component.ts';
 export { useParent } from './core/hooks/use-parent.ts';
 export { useChild, useChildren } from './core/hooks/use-child.ts';

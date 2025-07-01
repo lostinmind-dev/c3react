@@ -18,7 +18,7 @@ export abstract class Layout {
 
     private layout!: IAnyProjectLayout;
 
-    constructor(private readonly name: string) {
+    constructor(readonly name: string) {
         layouts.add(this);
     }
 

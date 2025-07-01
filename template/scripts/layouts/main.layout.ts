@@ -3,7 +3,6 @@ import { Layout, utils } from 'c3react';
 import C3React from '@/components/c3react.ts';
 import Button from '@/components/button.ts';
 
-
 export default class Main extends Layout {
     readonly restartBtn = new Button('restart', 'Restart', () => {
         runtime.goToLayout('main');

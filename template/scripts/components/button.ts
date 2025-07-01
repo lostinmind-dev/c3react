@@ -25,17 +25,6 @@ export default class Button extends Component<{
             (i) => i.instVars.id === id
         );
 
-        useTouched(() => this.getRoot(), (type) => {
-            switch (type) {
-                case 'start': { this.animateIn(); } break;
-                case 'end': {
-                    const { onClicked } = this.getState();
-                    this.animateOut();
-                    onClicked?.(this);
-                } break;
-            }
-        });
-
         this.onChanged('label', () => this.updateText());
         this.onChanged('color', () => this.updateColor());
     }
@@ -46,6 +35,17 @@ export default class Button extends Component<{
 
         this.updateText();
         this.updateColor();
+
+        useTouched(() => this.getRoot(), (type) => {
+            switch (type) {
+                case 'start': { this.animateIn(); } break;
+                case 'end': {
+                    const { onClicked } = this.getState();
+                    this.animateOut();
+                    onClicked?.(this);
+                } break;
+            }
+        });
     }
 
     private updateText() {

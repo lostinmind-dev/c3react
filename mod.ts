@@ -8,9 +8,10 @@ export {
     Component, type ExtractObjectInstType,
     EventsHandler,
     Layout,
-    Modal,
 
     useComponent,
+    useLayout,
+    
     useParent,
     useChild,
     useChildren,
