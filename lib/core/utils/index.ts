@@ -1,4 +1,5 @@
 import type { ExtractObjectInstType } from '../component.ts';
+import { mouse } from '../inputs/mouse.ts';
 import { pointer } from '../inputs/pointer.ts';
 
 export function wait(seconds: number) {
@@ -26,16 +27,20 @@ export function distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
+type CreateObjectOpts = {
+    layerName: string,
+    x: number,
+    y: number,
+    templateName: string,
+    width: number,
+    height: number,
+    opacity: number,
+    angle: number,
+}
+
 export function createObject<N extends keyof IConstructProjectObjects>(
     name: N,
-    opts?: Partial<{
-        layerName: string,
-        x: number,
-        y: number,
-        templateName: string,
-        width: number,
-        height: number,
-    }>
+    opts?: Partial<CreateObjectOpts>
 ) {
     const object = runtime.objects[name];
     const instance = object.createInstance(
@@ -46,22 +51,17 @@ export function createObject<N extends keyof IConstructProjectObjects>(
         opts?.templateName
     ) as ExtractObjectInstType<N>;
 
-    if (opts?.width) instance.width = opts.width;
-    if (opts?.height) instance.height = opts.height;
+    if (typeof opts?.width !== 'undefined') instance.width = opts.width;
+    if (typeof opts?.height !== 'undefined') instance.height = opts.height;
+    if (typeof opts?.opacity !== 'undefined') instance.opacity = opts.opacity;
+    if (typeof opts?.angle !== 'undefined') instance.angleDegrees = opts.angle;
 
     return instance;
 }
 
 export function createObjects<N extends keyof IConstructProjectObjects>(
     name: N,
-    ...objects: Partial<{
-        layerName: string,
-        x: number,
-        y: number,
-        templateName: string,
-        width: number,
-        height: number,
-    }>[]
+    ...objects: Partial<CreateObjectOpts>[]
 ) {
     const instances: ExtractObjectInstType<N>[] = [];
 
@@ -81,7 +81,21 @@ export function isCoordsOverBBox(bbox: DOMRect, x: number, y: number) {
     );
 }
 
-export function checkTouched(instance: IWorldInstance) {
+export function isMouseOver(instance: IWorldInstance) {
+    const layer = instance.layer;
+    if (!layer.isInteractive) return false;
+
+    const [x, y] = mouse.getCoords('current');
+    const [translatedX, translatedY] = layer.cssPxToLayer(x, y);
+
+    return isCoordsOverBBox(
+        instance.getBoundingBox(),
+        translatedX,
+        translatedY,
+    );
+}
+
+export function isPointerOver(instance: IWorldInstance) {
     const layer = instance.layer;
     if (!layer.isInteractive) return false;
 

@@ -5,7 +5,7 @@ export {
     mouse,
     keyboard,
 
-    Component,
+    Component, type ExtractObjectInstType,
     EventsHandler,
     Layout,
     Modal,
@@ -19,6 +19,7 @@ export {
     useEffect,
 
     useTouched,
+    useMouseOver,
 
     utils,
 } from './lib/core.ts';

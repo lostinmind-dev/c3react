@@ -1,15 +1,13 @@
-import app, { pointer } from 'c3react';
+import app from 'c3react';
 import gsap from 'gsap';
 
-import mainLayout from '@/layouts/main.layout.ts';
-
-pointer.init();
+import Main from '@/layouts/main.layout.ts';
 
 app.init({
-    devTools: true,
+    inputs: ['pointer'],
     layouts: [
         /** Initialize layouts here... */
-        mainLayout
+        new Main(),
     ],
     beforeStart: async () => {
         /** Do someting it's like runOnStartup() inside block  */

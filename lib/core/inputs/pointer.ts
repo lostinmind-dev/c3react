@@ -7,7 +7,61 @@ export class C3ReactPointer extends EventsHandler<{
     'up': ConstructPointerEvent;
     'cancel': ConstructPointerEvent;
 }> {
-    private isInited: boolean = false;
+    private static isInited: boolean = false;
+
+    static init(pointer: C3ReactPointer) {
+        if (this.isInited) return;
+
+        app.on('pointerdown', (e) => {
+            pointer.#isTouching = true;
+
+            pointer.coordinates.start = {
+                x: e.clientX,
+                y: e.clientY
+            };
+
+            pointer.emit('down', e);
+        });
+
+        app.on('pointermove', (e) => {
+            const [prevX, prevY] = pointer.getCoords('previous');
+
+            if (prevX !== 0 && prevY !== 0) {
+                const dx = e.clientX - prevX;
+                const dy = e.clientY - prevY;
+
+                pointer.#angleRadians = Math.atan2(dy, dx);         // Угол в радианах
+                pointer.#angleDegrees = pointer.angleRadians * (180 / Math.PI); // В градусах
+            }
+
+            pointer.coordinates.previous = {
+                x: pointer.coordinates.current.x,
+                y: pointer.coordinates.current.y,
+            };
+
+            pointer.coordinates.current = {
+                x: e.clientX,
+                y: e.clientY,
+            };
+
+            pointer.emit('move', e);
+        });
+
+        app.on('pointerup', (e) => {
+            pointer.#isTouching = false;
+            pointer.coordinates.end = {
+                x: e.clientX,
+                y: e.clientY,
+            };
+
+            pointer.emit('up', e);
+        });
+
+        app.on('pointercancel', (e) => pointer.emit('cancel', e));
+        app.on('afteranylayoutend', () => pointer.release());
+
+        this.isInited = true;
+    }
 
     private readonly coordinates = {
         start: { x: 0, y: 0 },
@@ -30,60 +84,6 @@ export class C3ReactPointer extends EventsHandler<{
 
     public get angleDegrees() {
         return this.#angleDegrees;
-    }
-
-    public init() {
-        if (this.isInited) return;
-
-        app.on('pointerdown', (e) => {
-            this.#isTouching = true;
-
-            this.coordinates.start = {
-                x: e.clientX,
-                y: e.clientY
-            };
-
-            this.emit('down', e);
-        });
-
-        app.on('pointermove', (e) => {
-            const [prevX, prevY] = this.getCoords('previous');
-
-            if (prevX !== 0 && prevY !== 0) {
-                const dx = e.clientX - prevX;
-                const dy = e.clientY - prevY;
-
-                this.#angleRadians = Math.atan2(dy, dx);         // Угол в радианах
-                this.#angleDegrees = this.angleRadians * (180 / Math.PI); // В градусах
-            }
-
-            this.coordinates.previous = {
-                x: this.coordinates.current.x,
-                y: this.coordinates.current.y,
-            };
-
-            this.coordinates.current = {
-                x: e.clientX,
-                y: e.clientY,
-            };
-
-            this.emit('move', e);
-        });
-
-        app.on('pointerup', (e) => {
-            this.#isTouching = false;
-            this.coordinates.end = {
-                x: e.clientX,
-                y: e.clientY,
-            };
-
-            this.emit('up', e);
-        });
-
-        app.on('pointercancel', (e) => this.emit('cancel', e));
-        app.on('afteranylayoutend', () => this.release());
-
-        this.isInited = true;
     }
 
     getCoords<T extends keyof typeof this.coordinates>(type: T) {

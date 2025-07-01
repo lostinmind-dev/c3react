@@ -1,6 +1,6 @@
 
 import { pointer } from '../inputs/pointer.ts';
-import { checkTouched } from '../utils/index.ts';
+import { isPointerOver } from '../utils/index.ts';
 
 export function useTouched<I extends IWorldInstance>(
     instance: I | (() => I),
@@ -13,15 +13,15 @@ export function useTouched<I extends IWorldInstance>(
 
     const subscribers = [
         pointer.on('down', () => {
-            if (checkTouched(inst)) handler('start');
+            if (isPointerOver(inst)) handler('start');
         }),
     
         pointer.on('up', () => {
-            if (checkTouched(inst)) handler('end');
+            if (isPointerOver(inst)) handler('end');
         }),
     ];
     
     inst.addEventListener('destroy', () => {
         subscribers.forEach(unsubscribe => unsubscribe());
-    })
+    });
 }

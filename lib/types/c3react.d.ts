@@ -1,3 +1,5 @@
+import type { Component } from '@lostinmind/c3react';
+
 declare global {
     namespace C3React {
         namespace Mouse {
@@ -128,8 +130,13 @@ declare global {
         type Size = { width: number; height: number };
     }
 
-
     const runtime: IRuntime;
+
+    interface Window {
+        c3react: {
+            getComponents(): Component[];
+        }
+    }
 }
 
 export {};

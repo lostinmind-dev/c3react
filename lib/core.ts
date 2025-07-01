@@ -8,7 +8,7 @@ export { mouse } from './core/inputs/mouse.ts';
 
 export { app } from './core/app.ts';
 export { Layout } from './core/layout.ts';
-export { Component } from './core/component.ts';
+export { Component, type ExtractObjectInstType } from './core/component.ts';
 export { Modal } from './core/modal.ts';
 
 /** Utils */
@@ -23,3 +23,4 @@ export { useObject, useObjects } from './core/hooks/use-object.ts';
 export { useEffect } from './core/hooks/use-effect.ts';
 
 export { useTouched } from './core/hooks/use-touched.ts';
+export { useMouseOver } from './core/hooks/use-mouse-over.ts';

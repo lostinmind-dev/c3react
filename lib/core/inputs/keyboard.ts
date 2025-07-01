@@ -5,26 +5,20 @@ export class C3ReactKeyboard extends EventsHandler<{
     'down': KeyboardEvent;
     'up': KeyboardEvent;
 }> {
-    private isInited: boolean = false;
+    private static isInited: boolean = false;
 
-    private readonly keys = new Map<string, C3React.Keyboard.KeyState>();
-    private previousKeys = new Map<string, C3React.Keyboard.KeyState>();
-    
-    private readonly pressListeners = new Map<string, Set<() => void>>();
-    private readonly releaseListeners = new Map<string, Set<() => void>>();
-
-    public init() {
+    static init(keyboard: C3ReactKeyboard) {
         if (this.isInited) return;
 
         app.on('keydown', (e) => {
-            this.emit('down', e);
+            keyboard.emit('down', e);
 
-            const previousState = this.keys.get(e.code);
+            const previousState = keyboard.keys.get(e.code);
 
             if (previousState !== 'down') {
-                this.keys.set(e.code, 'down');
+                keyboard.keys.set(e.code, 'down');
 
-                const handlers = this.pressListeners.get(e.code);
+                const handlers = keyboard.pressListeners.get(e.code);
 
                 if (!handlers) return;
 
@@ -33,22 +27,28 @@ export class C3ReactKeyboard extends EventsHandler<{
         });
 
         app.on('keyup', (e) => {
-            this.emit('up', e);
+            keyboard.emit('up', e);
 
-            this.keys.set(e.code, 'up');
+            keyboard.keys.set(e.code, 'up');
 
-            const handlers = this.releaseListeners.get(e.code);
+            const handlers = keyboard.releaseListeners.get(e.code);
 
             if (!handlers) return;
 
             handlers.forEach(handler => handler());
         });
 
-        app.on('tick', () => this.update());
-        app.on('afteranylayoutend', () => this.release());
+        app.on('tick', () => keyboard.update());
+        app.on('afteranylayoutend', () => keyboard.release());
 
         this.isInited = true;
     }
+
+    private readonly keys = new Map<string, C3React.Keyboard.KeyState>();
+    private previousKeys = new Map<string, C3React.Keyboard.KeyState>();
+    
+    private readonly pressListeners = new Map<string, Set<() => void>>();
+    private readonly releaseListeners = new Map<string, Set<() => void>>();
 
     private update() {
         this.previousKeys = new Map(this.keys);

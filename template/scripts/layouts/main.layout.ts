@@ -1,10 +1,10 @@
-import app, { Layout, useObject, utils } from 'c3react';
+import { Layout, utils } from 'c3react';
 
 import C3React from '@/components/c3react.ts';
 import Button from '@/components/button.ts';
 
 
-export class MainLayout extends Layout {
+export default class Main extends Layout {
     readonly restartBtn = new Button('restart', 'Restart', () => {
         runtime.goToLayout('main');
     });
@@ -13,18 +13,18 @@ export class MainLayout extends Layout {
 
     readonly rotateBtn = new Button('rotate', 'Rotate', (btn) => {
         this.c3react.rotate(utils.random(-360, 360));
-    
+
         btn.change('color', [
             utils.random(0, 255),
             utils.random(0, 255),
             utils.random(0, 255)
         ]);
     });
-    
+
     readonly resizeBtn = new Button('resize', 'Resize', (btn) => {
         const [width, height] = [utils.random(128, 428), utils.random(128, 428)];
         this.c3react.resize(width, height);
-    
+
         btn.change('color', [
             utils.random(0, 255),
             utils.random(0, 255),
@@ -43,10 +43,9 @@ export class MainLayout extends Layout {
         ]);
     });
 
+    constructor() { super('main'); }
+
     protected onStart() {
         console.log('On start!');
     };
 }
-
-const layout = new MainLayout('main');
-export default layout;

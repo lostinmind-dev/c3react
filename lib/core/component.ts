@@ -177,9 +177,9 @@ export abstract class Component<
     public change<K extends string & keyof S>(key: K, value: S[K]) {
         const handlers = this.onChangedEvents.get(key);
 
-        if (handlers) handlers.forEach(handler => handler(this.state[key]));
-
         this.state[key] = value;
+        
+        if (handlers) handlers.forEach(handler => handler(this.state[key]));
     }
 
     public destroyRoot() {
@@ -193,3 +193,7 @@ export abstract class Component<
 }
 
 Component.init();
+
+window.c3react['getComponents'] = () => {
+    return [...components.toArray()];
+}

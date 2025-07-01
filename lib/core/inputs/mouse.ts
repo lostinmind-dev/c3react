@@ -18,7 +18,69 @@ export class C3ReactMouse extends EventsHandler<{
     'up': MouseEvent;
     'wheel': WheelEvent;
 }> {
-    private isInited: boolean = false;
+    private static isInited: boolean = false;
+
+    static init(mouse: C3ReactMouse) {
+        if (this.isInited) return;
+
+        app.on('mousedown', (e) => {
+            mouse.coordinates.start = {
+                x: e.clientX,
+                y: e.clientY
+            };
+
+            const previousState = mouse.buttons.get(e.button);
+            if (previousState !== 'down') {
+                mouse.buttons.set(e.button, 'down');
+
+                const handlers = mouse.clickListeners.get(e.button);
+
+                if (handlers) handlers.forEach(handler => handler());
+            }
+
+            mouse.emit('down', e);
+        });
+
+        app.on('mousemove', (e) => {
+            mouse.coordinates.previous = {
+                x: mouse.coordinates.current.x,
+                y: mouse.coordinates.current.y,
+            };
+
+            mouse.coordinates.current = {
+                x: e.clientX,
+                y: e.clientY,
+            };
+
+            mouse.buttons.set(e.button, 'up');
+
+            const handlers = mouse.releaseListeners.get(e.button);
+
+            if (handlers) handlers.forEach(handler => handler());
+
+            mouse.emit('move', e);
+        });
+
+        app.on('dblclick', (e) => mouse.emit('dblclick', e));
+
+
+        app.on('wheel', (e) => {
+            const direction: C3React.Mouse.WheelDirection = (e.deltaY > 0)
+                ? 'down'
+                : 'up';
+
+            const handlers = mouse.wheelListeners.get(direction);
+
+            if (handlers) handlers.forEach(handler => handler());
+
+            mouse.emit('wheel', e);
+        });
+
+        app.on('tick', () => mouse.update())
+        app.on('afteranylayoutend', () => mouse.release());
+
+        this.isInited = true;
+    }
 
     private readonly coordinates = {
         start: { x: 0, y: 0 },
@@ -34,68 +96,6 @@ export class C3ReactMouse extends EventsHandler<{
     private readonly releaseListeners = new Map<number, Set<() => void>>();
     private readonly dblClickListeners = new Map<number, Set<() => void>>();
     private readonly wheelListeners = new Map<C3React.Mouse.WheelDirection, Set<() => void>>();
-
-    public init() {
-        if (this.isInited) return;
-
-        app.on('mousedown', (e) => {
-            this.coordinates.start = {
-                x: e.clientX,
-                y: e.clientY
-            };
-
-            const previousState = this.buttons.get(e.button);
-            if (previousState !== 'down') {
-                this.buttons.set(e.button, 'down');
-
-                const handlers = this.clickListeners.get(e.button);
-
-                if (handlers) handlers.forEach(handler => handler());
-            }
-
-            this.emit('down', e);
-        });
-
-        app.on('mousemove', (e) => {
-            this.coordinates.previous = {
-                x: this.coordinates.current.x,
-                y: this.coordinates.current.y,
-            };
-
-            this.coordinates.current = {
-                x: e.clientX,
-                y: e.clientY,
-            };
-
-            this.buttons.set(e.button, 'up');
-
-            const handlers = this.releaseListeners.get(e.button);
-
-            if (handlers) handlers.forEach(handler => handler());
-
-            this.emit('move', e);
-        });
-
-        app.on('dblclick', (e) => this.emit('dblclick', e));
-
-
-        app.on('wheel', (e) => {
-            const direction: C3React.Mouse.WheelDirection = (e.deltaY > 0)
-                ? 'down'
-                : 'up';
-
-            const handlers = this.wheelListeners.get(direction);
-
-            if (handlers) handlers.forEach(handler => handler());
-
-            this.emit('wheel', e);
-        });
-
-        app.on('tick', () => this.update())
-        app.on('afteranylayoutend', () => this.release());
-
-        this.isInited = true;
-    }
 
     private update() {
         this.previousButtons = new Map(this.buttons);

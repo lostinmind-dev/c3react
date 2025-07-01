@@ -1,6 +1,8 @@
 import type { Handler } from './utils/events-handler.ts';
 import type { Layout } from './layout.ts';
-import { initDevTools } from './dev-tools.ts';
+import { C3ReactKeyboard, keyboard } from './inputs/keyboard.ts';
+import { C3ReactMouse, mouse } from './inputs/mouse.ts';
+import { C3ReactPointer, pointer } from './inputs/pointer.ts';
 
 type AppHandler = {
     method: Handler;
@@ -25,13 +27,19 @@ class App {
     }
 
     init(opts: {
-        devTools?: true,
-        layouts: Layout[];
-        beforeStart: () => void | Promise<void>;
+        inputs?: ('keyboard' | 'mouse' | 'pointer')[],
+        layouts: Layout[] | readonly Layout[],
+        beforeStart: () => void | Promise<void>,
     }) {
         if (this.isInited) return;
 
-        if (opts.devTools) initDevTools();
+        if (opts?.inputs) {
+            const inputs = new Set(opts.inputs);
+
+            if (inputs.has('keyboard')) C3ReactKeyboard.init(keyboard);
+            if (inputs.has('mouse')) C3ReactMouse.init(mouse);
+            if (inputs.has('pointer')) C3ReactPointer.init(pointer);
+        }
 
         this.on('afteranylayoutend', () => {
             const cachedHandlers = this.events
@@ -97,3 +105,8 @@ class App {
 }
 
 export const app = new App();
+
+
+window['c3react'] = {
+    getComponents: () => { return [] }
+};
