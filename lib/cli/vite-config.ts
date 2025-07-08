@@ -1,12 +1,17 @@
 import { defineConfig } from 'npm:vite';
 import { resolve } from 'node:path';
 
-export function createConfig(watch?: true) {
+export function createConfig(prod?: true) {
     const c3reactPath = resolve(import.meta.dirname || '', '../../mod.ts');
 
     return defineConfig({
         build: {
-            watch: watch ? {} : null,
+            watch: (prod) ? {} : null,
+            minify: (prod) ? 'esbuild' : false,
+            sourcemap: (prod) ? 'inline' : false,
+            emptyOutDir: false,
+            outDir: 'project/scripts',
+            target: 'es2022',
             rollupOptions: {
                 // Один главный файл, который импортирует все остальные
                 input: resolve(Deno.cwd(), 'scripts/main.ts'),
@@ -15,12 +20,17 @@ export function createConfig(watch?: true) {
                     format: 'esm',
                     entryFileNames: 'main.js',
                 },
-                treeshake: 'recommended',
+                treeshake: true,
             },
-            outDir: 'project/scripts',
-            emptyOutDir: false,
-            sourcemap: (watch) ? 'inline' : false,
-            target: 'es2022',
+            // terserOptions: (prod) ? {
+            //     compress: {
+            //         drop_console: true,
+            //         drop_debugger: true,
+            //     },
+            //     format: {
+            //         comments: false,
+            //     },
+            // } : undefined,
         },
         resolve: {
             alias: {

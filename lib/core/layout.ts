@@ -1,7 +1,7 @@
 import { app } from './app.ts';
 import { Collection } from './utils/collection.ts';
 
-const layouts = new Collection<Layout>();
+export const layouts = new Collection<Layout>();
 
 export abstract class Layout {
     private static initsCount: number = 0;
@@ -16,27 +16,27 @@ export abstract class Layout {
         this.initsCount++;
     }
 
-    private layout!: IAnyProjectLayout;
+    private root?: IAnyProjectLayout;
 
-    constructor(readonly name: string) {
+    constructor(private readonly name: string) {
         layouts.add(this);
     }
 
     protected getRoot() {
-        if (!this.layout) throw new Error('Layout was NOT defined yet');
+        if (!this.root) throw new Error('Layout was NOT defined yet');
 
-        return this.layout;
+        return this.root;
     }
 
     private setRoot(layout: IAnyProjectLayout) {
-        if (this.layout) throw new Error(`Can't set ROOT layout, it was already defined before!`);
+        if (this.root) throw new Error(`Can't set ROOT layout, it was already defined before!`);
 
         layout.addEventListener('beforelayoutstart', () => this.beforeStart());
         layout.addEventListener('afterlayoutstart', () => this.onStart());
         layout.addEventListener('beforelayoutend', () => this.beforeEnd());
         layout.addEventListener('afterlayoutend', () => this.onEnd());
 
-        this.layout = layout;
+        this.root = layout;
     }
 
     protected beforeStart() { }

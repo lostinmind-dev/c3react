@@ -1,13 +1,22 @@
 export type Handler<Data = any> = (data: Data) => void;
 
-export class EventsHandler<
-    Events extends Record<string, any>,
-> {
-    private readonly events = new Map<keyof Events, Set<Handler>>();
+type EventHandler = {
+    method: Handler;
+    once: boolean,
+    unsubscribe: () => void,
+}
 
-    on<Event extends keyof Events>(
-        event: Event,
-        handler: Handler<Events[Event]>,
+export class EventsHandler<
+    EventsMap extends Record<string, any>,
+> {
+    private readonly events = new Map<keyof EventsMap, Set<EventHandler>>();
+
+    on<T extends keyof EventsMap>(
+        event: T,
+        handler: Handler<EventsMap[T]>,
+        opts?: Partial<{
+            once: true,
+        }>
     ) {
         let handlers = this.events.get(event);
 
@@ -16,23 +25,33 @@ export class EventsHandler<
             handlers = this.events.get(event)!;
         }
 
-        handlers.add(handler);
-
-        return () => {
-            handlers.delete(handler);
+        const unsubscribe = () => {
+            handlers.delete(eventHandler);
         }
+
+        const eventHandler: EventHandler = {
+            method: handler,
+            once: opts?.once || false,
+            unsubscribe,
+        };
+
+        handlers.add(eventHandler);
+
+        return eventHandler;
     }
 
-    protected emit<Event extends keyof Events>(
-        event: Event,
-        ...data: Events[Event] extends void ? [] : [Events[Event]]
+    protected emit<T extends keyof EventsMap>(
+        event: T,
+        ...data: EventsMap[T] extends void ? [] : [EventsMap[T]]
     ) {
         const handlers = this.events.get(event);
 
         if (!handlers) return;
 
         for (const handler of handlers) {
-            handler(data[0]);
+            handler.method(data[0]);
+
+            if (handler.once) handler.unsubscribe();
         }
     }
 

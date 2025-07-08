@@ -1,35 +1,33 @@
-import type { Handler } from './utils/events-handler.ts';
 import { app } from './app.ts';
 import { Collection } from './utils/collection.ts';
+import { State } from './state.ts';
 
-export type ExtractObjectInstType<N extends keyof IConstructProjectObjects> =
+export type ExtractInstanceType<N extends keyof IConstructProjectObjects> =
     NonNullable<
         ReturnType<
             IConstructProjectObjects[N]['getFirstInstance']
         >
     >;
 
-function useObject<N extends keyof IConstructProjectObjects>(
+function getObject<N extends keyof IConstructProjectObjects>(
     name: N,
-    pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
+    pickBy?: (inst: ExtractInstanceType<N>) => boolean,
 ) {
     const object = runtime.objects[name];
-    let instance: ExtractObjectInstType<N> | undefined;
+    let instance: ExtractInstanceType<N> | undefined;
 
     if (pickBy) {
-        //@ts-ignore;
         instance = object.instances().find((i) => pickBy(i));
 
         return instance;
     }
 
-    //@ts-ignore;
     instance = object.getFirstInstance() || undefined;
 
     return instance;
 }
 
-export const components = new Collection<Component>();
+export const components = new Collection<Component<any, any>>();
 
 /**
  * Public methods are for using ONLY outside component
@@ -37,10 +35,7 @@ export const components = new Collection<Component>();
  * get/set without public/protected are for using BOTH inside AND outside component
  */
 
-export abstract class Component<
-    S extends object = any,
-    N extends keyof IConstructProjectObjects = any
-> {
+export abstract class Component<N extends keyof IConstructProjectObjects, S extends Record<string, any>> {
     private static initsCount: number = 0;
 
     static init() {
@@ -52,9 +47,9 @@ export abstract class Component<
                 c.objectName === instance.objectType.name
             );
 
-            let component: Component;
+            let component: Component<any, any>;
             for (component of filteredComponents) {
-                const pickedInstance = useObject(
+                const pickedInstance = getObject(
                     component.objectName,
                     component.pickBy,
                 );
@@ -68,6 +63,7 @@ export abstract class Component<
             }
         });
 
+        //@ts-ignore;
         app.on('hierarchyready', ({ instance }) => {
             // console.log('HIERARCHY READY UID:', instance.uid, instance)
             const filteredComponents = components.toArray().filter((c) =>
@@ -84,7 +80,7 @@ export abstract class Component<
                 component.onDestroyed();
                 // component.root = undefined;
                 if (component.isCached) {
-                    component.onChangedEvents.clear();
+                    component.state.removeAllListeners();
                     components.delete(component);
                 };
             }
@@ -98,9 +94,11 @@ export abstract class Component<
         this.initsCount++;
     }
 
-    private readonly onChangedEvents = new Map<string, Set<Handler>>();
-    private root?: ExtractObjectInstType<N>;
-    private state: S;
+    private readonly objectName?: N;
+    private readonly pickBy?: (inst: ExtractInstanceType<N>) => boolean;
+    private root?: ExtractInstanceType<N>;
+
+    readonly state: State<S>;
 
     #isDestroyed: boolean = false;
 
@@ -109,7 +107,7 @@ export abstract class Component<
     }
 
     protected get isReady() {
-        return typeof this.root !== 'undefined'; 
+        return typeof this.root !== 'undefined';
     }
 
     /**
@@ -117,16 +115,19 @@ export abstract class Component<
      */
     protected isCached: boolean = false;
 
-    constructor(
-        initialState: S,
-        private readonly objectName?: N,
-        private readonly pickBy?: (inst: ExtractObjectInstType<N>) => boolean,
-    ) {
-        this.state = initialState;
+    constructor(opts: {
+        objectName?: N,
+        state: S | (() => S),
+        pickBy?: (inst: ExtractInstanceType<N>) => boolean,
+    }) {
+        this.objectName = opts.objectName;
+        this.pickBy = opts.pickBy;
+
+        this.state = new State(opts.state);
         components.add(this);
 
-        if (typeof runtime !== 'undefined' && objectName) {
-            const root = useObject(objectName, pickBy);
+        if (typeof runtime !== 'undefined' && this.objectName) {
+            const root = getObject(this.objectName, this.pickBy);
 
             if (root) {
                 this.root = root;
@@ -158,29 +159,6 @@ export abstract class Component<
 
     /** Triggers when ROOT instance was destroyed */
     protected onDestroyed() { };
-
-    protected onChanged<K extends string & keyof S>(key: K, handler: Handler<S[K]>) {
-        let handlers = this.onChangedEvents.get(key);
-
-        if (!handlers) {
-            this.onChangedEvents.set(key, new Set());
-            handlers = this.onChangedEvents.get(key)!;
-        }
-
-        handlers.add(handler);
-    }
-
-    public getState() {
-        return this.state;
-    }
-
-    public change<K extends string & keyof S>(key: K, value: S[K]) {
-        const handlers = this.onChangedEvents.get(key);
-
-        this.state[key] = value;
-        
-        if (handlers) handlers.forEach(handler => handler(this.state[key]));
-    }
 
     public destroyRoot() {
         if (this.isDestroyed || !this.root) {

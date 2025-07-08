@@ -12,7 +12,7 @@ export function useMouseOver<I extends IWorldInstance>(
 
     let wasOver = false;
 
-    const unsubscribe = mouse.on('move', () => {
+    const eventHandler = mouse.on('move', () => {
         const isOver = isMouseOver(inst);
 
         if (isOver && !wasOver) {
@@ -24,5 +24,5 @@ export function useMouseOver<I extends IWorldInstance>(
         }
     });
 
-    inst.addEventListener('destroy', () => unsubscribe());
+    inst.addEventListener('destroy', () => eventHandler.unsubscribe());
 }

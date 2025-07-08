@@ -11,7 +11,7 @@ export function useTouched<I extends IWorldInstance>(
         : instance
     ;
 
-    const subscribers = [
+    const eventHandlers = [
         pointer.on('down', () => {
             if (isPointerOver(inst)) handler('start');
         }),
@@ -22,6 +22,6 @@ export function useTouched<I extends IWorldInstance>(
     ];
     
     inst.addEventListener('destroy', () => {
-        subscribers.forEach(unsubscribe => unsubscribe());
+        eventHandlers.forEach(handler => handler.unsubscribe());
     });
 }

@@ -1,8 +1,8 @@
-import type { ExtractObjectInstType } from '../component.ts';
+import type { ExtractInstanceType } from '../component.ts';
 
 export function useParent<
     N extends keyof IConstructProjectObjects,
-    I = ExtractObjectInstType<N>,
+    I = ExtractInstanceType<N>,
 >(
     instance: IWorldInstance | (() => IWorldInstance),
     objectName: N,

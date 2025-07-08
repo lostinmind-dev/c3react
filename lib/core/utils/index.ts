@@ -23,6 +23,21 @@ export function random(min: number, max: number) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
+export function random2(range: [number, number], range2: [number, number] = range): [number, number] {
+    const [min1, max1] = range;
+    const [min2, max2] = range2;
+
+    return [random(min1, max1), random(min2, max2)];
+}
+
+export function random3(range: [number, number], range2: [number, number] = range, range3: [number, number] = range2): [number, number, number] {
+    const [min1, max1] = range;
+    const [min2, max2] = range2;
+    const [min3, max3] = range3;
+
+    return [random(min1, max1), random(min2, max2), random(min3, max3)];
+}
+
 export function distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
@@ -43,6 +58,7 @@ export function createObject<N extends keyof IConstructProjectObjects>(
     opts?: Partial<CreateObjectOpts>
 ) {
     const object = runtime.objects[name];
+
     const instance = object.createInstance(
         opts?.layerName || 0,
         opts?.x || 0,
@@ -109,7 +125,7 @@ export function isPointerOver(instance: IWorldInstance) {
     );
 }
 
-export async function addScript(url: string, opts ?: {
+export async function addScript(url: string, opts?: {
     async?: true,
     module?: true,
 }) {

@@ -1,4 +1,4 @@
-import type { ExtractObjectInstType } from '../component.ts';
+import type { ExtractInstanceType } from '../component.ts';
 
 /**
  * Searching child in instance by proving "objectName" and optional "condition" parameters
@@ -9,7 +9,7 @@ import type { ExtractObjectInstType } from '../component.ts';
  */
 export function useChild<
     N extends keyof IConstructProjectObjects,
-    I = ExtractObjectInstType<N>,
+    I = ExtractInstanceType<N>,
 >(
     instance: IWorldInstance | (() => IWorldInstance),
     objectName: N,
@@ -48,7 +48,7 @@ export function useChild<
 
 export function useChildren<
     N extends keyof IConstructProjectObjects,
-    I = ExtractObjectInstType<N>,
+    I = ExtractInstanceType<N>,
 >(
     instance: IWorldInstance | (() => IWorldInstance),
     objectName: N,

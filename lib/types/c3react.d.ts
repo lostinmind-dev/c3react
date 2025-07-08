@@ -1,4 +1,4 @@
-import type { Component } from '@lostinmind/c3react';
+import type { Component } from '../core.ts';
 
 declare global {
     namespace C3React {
@@ -134,7 +134,7 @@ declare global {
 
     interface Window {
         c3react: {
-            getComponents(): Component[];
+            getComponents(): Component<any, any>[];
         }
     }
 }

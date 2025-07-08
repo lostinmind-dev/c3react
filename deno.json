@@ -1,4 +1,5 @@
 {
+    "nodeModulesDir": "manual",
     "name": "@lostinmind/c3react",
     "compilerOptions": {
         "noImplicitOverride": false,

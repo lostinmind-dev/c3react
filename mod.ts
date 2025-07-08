@@ -5,7 +5,7 @@ export {
     mouse,
     keyboard,
 
-    Component, type ExtractObjectInstType,
+    Component, type ExtractInstanceType,
     EventsHandler,
     Layout,
 

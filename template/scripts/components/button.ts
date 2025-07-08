@@ -1,31 +1,46 @@
 import { Component, useChild, useTouched, utils } from 'c3react';
 import gsap from 'gsap';
 
-export default class Button extends Component<{
-    label: string,
-    onClicked?: (btn: Button) => void,
+type Props = {
+    animation: {
+        /** @default 'power4.out' */
+        ease: gsap.EaseString,
+        /** @default 0.2 */
+        duration: number,
+    },
+    /** @default 'empty' */
+    text?: string,
+    /** @default [255, 255, 255] */
     color: Vec3Arr,
+    /** @default 1.1 */
     reduceFactor: number,
-}, 'button'> {
-    private readonly getLabel = useChild(() => this.getRoot(), 'text');
+    onClicked?: (btn: Button) => void,
+}
+
+export default class Button extends Component<Props, 'button'> {
+    private readonly getText = useChild(() => this.getRoot(), 'text');
 
     private initialSize: C3React.Size = {
         width: 0,
         height: 0,
     };
 
-    constructor(id: string, label: string, onClicked?: (btn: Button) => void) {
+    constructor(id: string, props?: Partial<Props>) {
         super({
-            label,
-            color: [148, 169, 184],
-            onClicked,
+            animation: {
+                ease: 'power4.out',
+                duration: 0.2,
+            },
+            color: [255, 255, 255],
             reduceFactor: 1.1,
+
+            ...props,
         },
             'button',
             (i) => i.instVars.id === id
         );
 
-        this.onChanged('label', () => this.updateText());
+        this.onChanged('text', () => this.updateText());
         this.onChanged('color', () => this.updateColor());
     }
 
@@ -48,13 +63,22 @@ export default class Button extends Component<{
         });
     }
 
+    protected onDestroyed() {
+        try {
+            const root = this.getRoot();
+            gsap.killTweensOf(root);
+        } catch (e) { }
+    }
+
     private updateText() {
-        const { label } = this.getState();
-        this.getLabel().text = label;
+        const { text } = this.getState();
+        if (text) this.getText().text = text;
     }
 
     private updateColor() {
-        const { color } = this.getState();
+        const { color, animation } = this.getState();
+        if (!color) return;
+
         const root = this.getRoot();
 
         const [r, g, b] = root.colorRgb;
@@ -66,8 +90,8 @@ export default class Button extends Component<{
             g: rgb[1],
             b: rgb[2],
 
-            duration: 1,
-            ease: 'power4.out',
+            duration: animation.duration,
+            ease: animation.ease,
             overwrite: true,
             onUpdate: () => { root.colorRgb = [$.r, $.g, $.b] }
         });
@@ -75,27 +99,28 @@ export default class Button extends Component<{
 
     private animateIn() {
         const { width, height } = this.initialSize;
-        const { reduceFactor } = this.getState();
+        const { reduceFactor, animation } = this.getState();
 
         gsap.to(this.getRoot(), {
             width: width / reduceFactor,
             height: height / reduceFactor,
 
-            duration: 0.2,
-            ease: 'power4.out',
+            duration: animation.duration,
+            ease: animation.ease,
             overwrite: true,
         });
     }
 
     private animateOut() {
         const { width, height } = this.initialSize;
+        const { animation } = this.getState();
 
         gsap.to(this.getRoot(), {
             width,
             height,
 
-            duration: 0.2,
-            ease: 'power4.out',
+            duration: animation.duration,
+            ease: animation.ease,
             overwrite: true,
         });
     }

@@ -3,48 +3,43 @@ import { Layout, utils } from 'c3react';
 import C3React from '@/components/c3react.ts';
 import Button from '@/components/button.ts';
 
-export default class Main extends Layout {
-    readonly restartBtn = new Button('restart', 'Restart', () => {
-        runtime.goToLayout('main');
-    });
 
+export default class Main extends Layout {
     readonly c3react = new C3React();
 
-    readonly rotateBtn = new Button('rotate', 'Rotate', (btn) => {
-        this.c3react.rotate(utils.random(-360, 360));
-
-        btn.change('color', [
-            utils.random(0, 255),
-            utils.random(0, 255),
-            utils.random(0, 255)
-        ]);
+    readonly restartButton = new Button('restart', {
+        onClicked: () => runtime.goToLayout('main')
     });
+    readonly rotateButton = new Button('rotate', {
+        onClicked: (btn) => { 
+            this.c3react.rotate(utils.random(-360, 360)); 
 
-    readonly resizeBtn = new Button('resize', 'Resize', (btn) => {
-        const [width, height] = [utils.random(128, 428), utils.random(128, 428)];
-        this.c3react.resize(width, height);
-
-        btn.change('color', [
-            utils.random(0, 255),
-            utils.random(0, 255),
-            utils.random(0, 255)
-        ]);
+            btn.change('color', utils.random3([0, 255]));
+        }
     });
+    readonly resizeButton = new Button('resize', {
+        onClicked: (btn) => {
+            const [width, height] = utils.random2([128, 428]);
+            this.c3react.resize(width, height);
 
-    readonly setPositionBtn = new Button('set-position', 'Random pos', (btn) => {
-        const [x, y] = [utils.random(0, 800), utils.random(0, 600)];
-        this.c3react.setPosition(x, y);
-
-        btn.change('color', [
-            utils.random(0, 255),
-            utils.random(0, 255),
-            utils.random(0, 255)
-        ]);
+            btn.change('color', utils.random3([0, 255]));
+        }
     });
+    readonly changePositionButton = new Button('set-position', {
+        onClicked: (btn) => {
+            const [x, y] = utils.random2([0, 800], [0, 600]);
+            this.c3react.setPosition(x, y);
 
-    constructor() { super('main'); }
+            btn.change('color', utils.random3([0, 255]));
+        }
+    })
+
+    constructor() {
+        super('main');
+    }
 
     protected onStart() {
-        console.log('On start!');
+        // this.ui.
+
     };
 }

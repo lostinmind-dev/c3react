@@ -1,6 +1,6 @@
 import { type Component, components } from '../component.ts';
 
-export function useComponent<T extends Component>(
+export function useComponent<T extends Component<any, any>>(
     componentClass: new (...args: any[]) => T,
     pickBy?: (component: InstanceType<typeof componentClass>) => boolean,
 ) {
