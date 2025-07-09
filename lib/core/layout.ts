@@ -1,4 +1,5 @@
 import { app } from './app.ts';
+import { StateType } from './state.ts';
 import { Collection } from './utils/collection.ts';
 
 export const layouts = new Collection<Layout>();

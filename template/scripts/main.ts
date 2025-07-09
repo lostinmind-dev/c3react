@@ -3,10 +3,10 @@ import app from 'c3react';
 import Main from '@/layouts/main.layout.ts';
 
 app.init({
+    inputs: ['pointer'],
     layouts: [Main],
     beforeStart: async () => {
         /** Do someting it's like runOnStartup() inside block  */
-
     },
 });
 

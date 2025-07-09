@@ -1,61 +1,61 @@
-export type Handler<Data = any> = (data: Data) => void;
+export type Handler<T = any> = (data: T) => void;
 
-type EventHandler = {
-    method: Handler;
-    once: boolean,
+export type Event<T = any> = {
+    handler: Handler<T>,
     unsubscribe: () => void,
+    once: boolean,
 }
 
 export class EventsHandler<
     EventsMap extends Record<string, any>,
 > {
-    private readonly events = new Map<keyof EventsMap, Set<EventHandler>>();
+    readonly #listeners = new Map<keyof EventsMap, Set<Event>>();
 
     on<T extends keyof EventsMap>(
-        event: T,
+        eventName: T,
         handler: Handler<EventsMap[T]>,
         opts?: Partial<{
             once: true,
         }>
     ) {
-        let handlers = this.events.get(event);
+        let handlers = this.#listeners.get(eventName);
 
         if (!handlers) {
-            this.events.set(event, new Set());
-            handlers = this.events.get(event)!;
+            this.#listeners.set(eventName, new Set());
+            handlers = this.#listeners.get(eventName)!;
         }
 
         const unsubscribe = () => {
-            handlers.delete(eventHandler);
+            handlers.delete(event);
         }
 
-        const eventHandler: EventHandler = {
-            method: handler,
+        const event: Event = {
+            handler,
             once: opts?.once || false,
             unsubscribe,
         };
 
-        handlers.add(eventHandler);
+        handlers.add(event);
 
-        return eventHandler;
+        return { unsubscribe };
     }
 
     protected emit<T extends keyof EventsMap>(
         event: T,
         ...data: EventsMap[T] extends void ? [] : [EventsMap[T]]
     ) {
-        const handlers = this.events.get(event);
+        const handlers = this.#listeners.get(event);
 
         if (!handlers) return;
 
         for (const handler of handlers) {
-            handler.method(data[0]);
+            handler.handler(data[0]);
 
             if (handler.once) handler.unsubscribe();
         }
     }
 
     protected release() {
-        this.events.clear();
+        this.#listeners.clear();
     }
 }

@@ -1,6 +1,6 @@
 import { app } from './app.ts';
 import { Collection } from './utils/collection.ts';
-import { State } from './state.ts';
+import { State, type StateType } from './state.ts';
 
 export type ExtractInstanceType<N extends keyof IConstructProjectObjects> =
     NonNullable<
@@ -8,6 +8,27 @@ export type ExtractInstanceType<N extends keyof IConstructProjectObjects> =
             IConstructProjectObjects[N]['getFirstInstance']
         >
     >;
+
+export type ExtractComponentGeneric<C, T extends 'objectName' | 'state'> = C extends Component<
+    infer N extends keyof IConstructProjectObjects,
+    infer S extends StateType
+> 
+    ? T extends 'objectName'
+    ? N
+    : T extends 'state'
+    ? S
+    : never : never
+;
+
+export type ExtractObjectName<C> = C extends Component<
+    infer N extends keyof IConstructProjectObjects,
+    infer S extends StateType
+> ? N : never;
+
+export type ExtractStateType<C> = C extends Component<
+    infer N extends keyof IConstructProjectObjects,
+    infer S extends StateType
+> ? S : never;
 
 function getObject<N extends keyof IConstructProjectObjects>(
     name: N,

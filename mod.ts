@@ -5,7 +5,11 @@ export {
     mouse,
     keyboard,
 
-    Component, type ExtractInstanceType,
+    Component, 
+    type ExtractInstanceType,
+    type ExtractStateType,
+    State,
+    
     EventsHandler,
     Layout,
 

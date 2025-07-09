@@ -8,7 +8,12 @@ export { mouse } from './core/inputs/mouse.ts';
 
 export { app } from './core/app.ts';
 export { Layout } from './core/layout.ts';
-export { Component, type ExtractInstanceType } from './core/component.ts';
+export { 
+    Component, 
+    type ExtractInstanceType,
+    type ExtractStateType,
+} from './core/component.ts';
+export { State } from './core/state.ts';
 
 /** Utils */
 export { EventsHandler } from './core/utils/events-handler.ts';

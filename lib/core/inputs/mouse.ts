@@ -1,5 +1,26 @@
+import type { CoordinatesType } from './pointer.ts';
 import { app } from '../app.ts';
-import { EventsHandler } from '../utils/events-handler.ts';
+import { EventsHandler, type Event } from '../utils/events-handler.ts';
+
+interface IC3ReactMouseEvent extends Event {
+    type: 'button' | 'wheel',
+};
+
+interface IC3ReactMouseButtonEvent extends IC3ReactMouseEvent {
+    type: 'button',
+    clickType: 'double-click' | 'click' | 'release',
+    button: C3React.Mouse.Buttons[keyof C3React.Mouse.Buttons],
+}
+
+interface IC3ReactMouseWheelEvent extends IC3ReactMouseEvent {
+    type: 'wheel',
+    direction: C3React.Mouse.WheelDirection,
+}
+
+type Events = {
+    button: IC3ReactMouseButtonEvent,
+    wheel: IC3ReactMouseWheelEvent,
+}
 
 const BUTTONS: C3React.Mouse.Buttons = {
     left: 0,
@@ -9,7 +30,6 @@ const BUTTONS: C3React.Mouse.Buttons = {
     fourth: 3,
     fifth: 4,
 };
-
 
 export class C3ReactMouse extends EventsHandler<{
     'down': MouseEvent;
@@ -24,44 +44,55 @@ export class C3ReactMouse extends EventsHandler<{
         if (this.isInited) return;
 
         app.on('mousedown', (e) => {
-            mouse.coordinates.start = {
+            mouse.coordinates.set('start', {
                 x: e.clientX,
                 y: e.clientY
-            };
+            });
 
             const previousState = mouse.buttons.get(e.button);
             if (previousState !== 'down') {
                 mouse.buttons.set(e.button, 'down');
 
-                const handlers = mouse.clickListeners.get(e.button);
-
-                if (handlers) handlers.forEach(handler => handler());
+                mouse.notifyListeners('button', (event) => event.clickType === 'click' && event.button === e.button);
             }
 
             mouse.emit('down', e);
         });
 
         app.on('mousemove', (e) => {
-            mouse.coordinates.previous = {
-                x: mouse.coordinates.current.x,
-                y: mouse.coordinates.current.y,
-            };
+            const [currentX, currentY] = mouse.getCoords('current');
 
-            mouse.coordinates.current = {
+            mouse.coordinates.set('previous', {
+                x: currentX,
+                y: currentY
+            });
+
+            mouse.coordinates.set('current', {
                 x: e.clientX,
                 y: e.clientY,
-            };
+            });
 
-            mouse.buttons.set(e.button, 'up');
-
-            const handlers = mouse.releaseListeners.get(e.button);
-
-            if (handlers) handlers.forEach(handler => handler());
 
             mouse.emit('move', e);
         });
 
-        app.on('dblclick', (e) => mouse.emit('dblclick', e));
+        app.on('mouseup', (e) => {
+            const [currentX, currentY] = mouse.getCoords('current');
+            mouse.coordinates.set('end', {
+                x: currentX,
+                y: currentY,
+            });
+
+            mouse.buttons.set(e.button, 'up');
+
+            mouse.notifyListeners('button', (event) => event.clickType === 'release' && event.button === e.button);
+            mouse.emit('up', e);
+        });
+
+        app.on('dblclick', (e) => {
+            mouse.notifyListeners('button', (event) => event.clickType === 'double-click' && event.button === e.button);
+            mouse.emit('dblclick', e);
+        });
 
 
         app.on('wheel', (e) => {
@@ -69,33 +100,47 @@ export class C3ReactMouse extends EventsHandler<{
                 ? 'down'
                 : 'up';
 
-            const handlers = mouse.wheelListeners.get(direction);
-
-            if (handlers) handlers.forEach(handler => handler());
-
+            mouse.notifyListeners('wheel', (event) => event.direction === direction);
             mouse.emit('wheel', e);
         });
 
         app.on('tick', () => mouse.update())
-        app.on('afteranylayoutend', () => mouse.release());
+        app.on('afteranylayoutend', () => mouse.removeAllListeners());
 
         this.isInited = true;
     }
 
-    private readonly coordinates = {
-        start: { x: 0, y: 0 },
-        current: { x: 0, y: 0 },
-        previous: { x: 0, y: 0 },
-        end: { x: 0, y: 0 },
-    } satisfies Record<'start' | 'current' | 'previous' | 'end', C3React.Position>;
+    private readonly coordinates = new Map<CoordinatesType, C3React.Position>();
 
     private readonly buttons = new Map<number, C3React.Mouse.ButtonState>();
     private previousButtons = new Map<number, C3React.Mouse.ButtonState>();
 
-    private readonly clickListeners = new Map<number, Set<() => void>>();
-    private readonly releaseListeners = new Map<number, Set<() => void>>();
-    private readonly dblClickListeners = new Map<number, Set<() => void>>();
-    private readonly wheelListeners = new Map<C3React.Mouse.WheelDirection, Set<() => void>>();
+    private readonly listeners = new Map<keyof Events, Set<Events[keyof Events]>>();
+
+    constructor() {
+        super();
+
+        this.coordinates.set('start', { x: 0, y: 0 });
+        this.coordinates.set('current', { x: 0, y: 0 });
+        this.coordinates.set('previous', { x: 0, y: 0 });
+        this.coordinates.set('end', { x: 0, y: 0 });
+    }
+
+    private notifyListeners<E extends keyof Events>(event: E, filter?: (event: Events[E]) => boolean) {
+        let events = this.listeners.get(event);
+
+        if (!events) return;
+        if (filter) {
+            //@ts-ignore;
+            const filteredEvents = Array.from(events).filter(event => filter(event));
+            events = new Set(filteredEvents);
+        }
+
+        for (const event of events) {
+            event.handler({});
+            if (event.once) event.unsubscribe();
+        }
+    }
 
     private update() {
         this.previousButtons = new Map(this.buttons);
@@ -109,54 +154,108 @@ export class C3ReactMouse extends EventsHandler<{
         });
     }
 
-    onClicked(button: keyof C3React.Mouse.Buttons, handler: () => void) {
-        const key = BUTTONS[button];
+    onClicked(button: keyof C3React.Mouse.Buttons, handler: () => void, opts?: Partial<{ once: boolean }>) {
+        let events = this.listeners.get('button');
 
-        let handlers = this.clickListeners.get(key);
-
-        if (!handlers) {
-            this.clickListeners.set(key, new Set());
-            handlers = this.clickListeners.get(key)!;
+        if (!events) {
+            this.listeners.set('button', new Set());
+            events = this.listeners.get('button')!;
         }
 
-        handlers.add(handler);
+        const unsubscribe = () => {
+            events.delete(event);
+        }
+
+        const event: IC3ReactMouseButtonEvent = {
+            type: 'button',
+            clickType: 'click',
+            handler,
+            unsubscribe,
+            button: BUTTONS[button],
+            once: opts?.once || false,
+        }
+
+        events.add(event);
+
+        return { unsubscribe };
     }
 
-    onReleased(button: keyof C3React.Mouse.Buttons, handler: () => void) {
-        const key = BUTTONS[button];
+    onReleased(button: keyof C3React.Mouse.Buttons, handler: () => void, opts?: Partial<{ once: boolean }>) {
+        let events = this.listeners.get('button');
 
-        let handlers = this.releaseListeners.get(key);
-
-        if (!handlers) {
-            this.releaseListeners.set(key, new Set());
-            handlers = this.releaseListeners.get(key)!;
+        if (!events) {
+            this.listeners.set('button', new Set());
+            events = this.listeners.get('button')!;
         }
 
-        handlers.add(handler);
+        const unsubscribe = () => {
+            events.delete(event);
+        }
+
+        const event: IC3ReactMouseButtonEvent = {
+            type: 'button',
+            clickType: 'release',
+            handler,
+            unsubscribe,
+            button: BUTTONS[button],
+            once: opts?.once || false,
+        }
+
+        events.add(event);
+
+        return { unsubscribe };
     }
 
-    onDblClicked(button: keyof C3React.Mouse.Buttons, handler: () => void) {
-        const key = BUTTONS[button];
+    onDblClicked(button: keyof C3React.Mouse.Buttons, handler: () => void, opts?: Partial<{ once: boolean }>) {
+        let events = this.listeners.get('button');
 
-        let handlers = this.dblClickListeners.get(key);
-
-        if (!handlers) {
-            this.dblClickListeners.set(key, new Set());
-            handlers = this.dblClickListeners.get(key)!;
+        if (!events) {
+            this.listeners.set('button', new Set());
+            events = this.listeners.get('button')!;
         }
 
-        handlers.add(handler);
+        const unsubscribe = () => {
+            events.delete(event);
+        }
+
+        const event: IC3ReactMouseButtonEvent = {
+            type: 'button',
+            clickType: 'double-click',
+            handler,
+            unsubscribe,
+            button: BUTTONS[button],
+            once: opts?.once || false,
+        }
+
+        events.add(event);
+
+        return { unsubscribe };
     }
 
-    onWheel(direction: C3React.Mouse.WheelDirection, handler: () => void) {
-        let handlers = this.wheelListeners.get(direction);
+    onWheel(direction: C3React.Mouse.WheelDirection, handler: () => void, opts?: Partial<{ once: boolean }>) {
 
-        if (!handlers) {
-            this.wheelListeners.set(direction, new Set());
-            handlers = this.wheelListeners.get(direction)!;
+        let events = this.listeners.get('wheel');
+
+        if (!events) {
+            this.listeners.set('wheel', new Set());
+            events = this.listeners.get('wheel')!;
         }
 
-        handlers.add(handler);
+        const unsubscribe = () => {
+            events.delete(event);
+        }
+
+        const event: IC3ReactMouseWheelEvent = {
+            type: 'wheel',
+            handler,
+            unsubscribe,
+            direction,
+            once: opts?.once || false,
+        }
+
+        events.add(event);
+
+        return { unsubscribe };
     }
 
     isPressed(button: keyof C3React.Mouse.Buttons) {
@@ -167,19 +266,16 @@ export class C3ReactMouse extends EventsHandler<{
         return this.buttons.get(BUTTONS[button]) === 'up';
     }
 
-    getCoords<T extends keyof typeof this.coordinates>(type: T) {
-        const {x, y}= this.coordinates[type];
+    getCoords<T extends CoordinatesType>(type: T) {
+        const { x, y } = this.coordinates.get(type)!;
         return [x, y] as const;
     }
 
-    protected override release(): void {
+    protected removeAllListeners() {
         super.release();
         this.buttons.clear();
         this.previousButtons.clear();
-        this.clickListeners.clear();
-        this.releaseListeners.clear();
-        this.dblClickListeners.clear();
-        this.wheelListeners.clear();
+        this.listeners.clear();
     }
 }
 

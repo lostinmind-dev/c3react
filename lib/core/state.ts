@@ -4,7 +4,15 @@ type OnChangedEvent<V> = {
     once: boolean,
 }
 
-export class State<S extends Record<string, any>> {
+type StateValue =
+    | string
+    | number
+    | boolean
+    | object
+;
+export type StateType = Record<string, StateValue>;
+
+export class State<S extends StateType> {
     private readonly initialValue: S;
     private value: S;
 
@@ -14,7 +22,7 @@ export class State<S extends Record<string, any>> {
         const initial = typeof initialValue === 'function'
             ? initialValue()
             : initialValue
-        ;
+            ;
 
         this.initialValue = structuredClone(initial);
         this.value = structuredClone(initial);
@@ -42,12 +50,12 @@ export class State<S extends Record<string, any>> {
             }
         }
     }
-    
+
     set(value: S | ((prevValue: S) => S)) {
         const next = typeof value === 'function'
             ? value(this.value)
             : value
-        ;
+            ;
 
         this.value = next;
     }

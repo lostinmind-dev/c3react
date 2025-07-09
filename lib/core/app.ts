@@ -1,29 +1,26 @@
-import type { Handler } from './utils/events-handler.ts';
+import type { Event, Handler } from './utils/events-handler.ts';
 import type { Layout } from './layout.ts';
 import { C3ReactKeyboard, keyboard } from './inputs/keyboard.ts';
 import { C3ReactMouse, mouse } from './inputs/mouse.ts';
 import { C3ReactPointer, pointer } from './inputs/pointer.ts';
 
-type AppHandler = {
-    method: Handler;
+interface IAppEvent extends Event {
     cached: boolean,
-    once: boolean,
-    unsubscribe: () => void,
 }
 
 class App {
     private isInited: boolean = false;
 
-    private readonly events = new Map<keyof RuntimeEventMap, Set<AppHandler>>();
+    private readonly listeners = new Map<keyof RuntimeEventMap, Set<IAppEvent>>();
 
-    private addRuntimeEventListener(event: keyof RuntimeEventMap, appHandler: AppHandler) {
-        if (appHandler.once) {
-            runtime.addEventListener(event, (e) => {
-                appHandler.method(e);
-                appHandler.unsubscribe();
+    private addRuntimeEventListener(eventName: keyof RuntimeEventMap, event: IAppEvent) {
+        if (event.once) {
+            runtime.addEventListener(eventName, (e) => {
+                event.handler(e);
+                event.unsubscribe();
             });
         } else {
-            runtime.addEventListener(event, appHandler.method)
+            runtime.addEventListener(eventName, event.handler)
         }
     }
 
@@ -47,7 +44,7 @@ class App {
         }
 
         this.on('afteranylayoutend', () => {
-            const cachedHandlers = this.events
+            const cachedEvents = this.listeners
                 .values()
                 .toArray()
                 .map(handlers => handlers.values().toArray())
@@ -55,7 +52,7 @@ class App {
                 .filter(handler => handler.cached)
                 ;
 
-            cachedHandlers.forEach(handler => handler.unsubscribe())
+                cachedEvents.forEach(event => event.unsubscribe())
         });
 
         runOnStartup(async (runtime) => {
@@ -65,8 +62,8 @@ class App {
             globalThis.runtime = runtime;
 
 
-            for (const [event, appHandlers] of this.events) {
-                appHandlers.forEach(appHandler => this.addRuntimeEventListener(event, appHandler));
+            for (const [eventName, events] of this.listeners) {
+                events.forEach(event => this.addRuntimeEventListener(eventName, event));
             }
 
             await opts.beforeStart?.();
@@ -75,37 +72,37 @@ class App {
 
     /** Returns method for unsubscribing from event */
     on<Event extends keyof RuntimeEventMap>(
-        event: Event,
+        eventName: Event,
         handler: Handler<RuntimeEventMap[Event]>,
         opts?: Partial<{
             cached: true,
             once: true,
         }>
     ) {
-        let handlers = this.events.get(event);
+        let events = this.listeners.get(eventName);
 
-        if (!handlers) {
-            this.events.set(event, new Set());
-            handlers = this.events.get(event)!;
+        if (!events) {
+            this.listeners.set(eventName, new Set());
+            events = this.listeners.get(eventName)!;
         }
 
         const unsubscribe = () => {
-            if (typeof runtime !== 'undefined') runtime.removeEventListener(event, handler);
-            handlers.delete(appHandler);
+            if (typeof runtime !== 'undefined') runtime.removeEventListener(eventName, handler);
+            events.delete(event);
         }
 
-        const appHandler: AppHandler = {
-            method: handler,
+        const event: IAppEvent = {
+            handler,
             once: opts?.once || false,
             cached: opts?.cached || false,
             unsubscribe,
         }
 
-        handlers.add(appHandler);
+        events.add(event);
 
-        if (typeof runtime !== 'undefined') this.addRuntimeEventListener(event, appHandler);
+        if (typeof runtime !== 'undefined') this.addRuntimeEventListener(eventName, event);
 
-        return appHandler;
+        return { unsubscribe };
     }
 }
 

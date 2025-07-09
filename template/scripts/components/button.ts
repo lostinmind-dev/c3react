@@ -1,7 +1,14 @@
-import { Component, useChild, useTouched, utils } from 'c3react';
+import { Component, useChild, useTouched, utils, ExtractStateType } from 'c3react';
 import gsap from 'gsap';
 
-type Props = {
+const DEFAULT_COLOR: Vec3Arr = [255, 255, 255];
+const DEFAULT_ANIMATION: ExtractStateType<Button>['animation'] = {
+    ease: 'power4.out',
+    duration: 0.2
+};
+const DEFAULT_REDUCE_FACTOR: number = 1.1;
+
+export default class Button extends Component<'button', {
     animation: {
         /** @default 'power4.out' */
         ease: gsap.EaseString,
@@ -14,34 +21,34 @@ type Props = {
     color: Vec3Arr,
     /** @default 1.1 */
     reduceFactor: number,
-    onClicked?: (btn: Button) => void,
-}
+}> {
+    // protected isCached: boolean = true;
 
-export default class Button extends Component<Props, 'button'> {
     private readonly getText = useChild(() => this.getRoot(), 'text');
+
+    onClicked?: (btn: Button) => void;
 
     private initialSize: C3React.Size = {
         width: 0,
         height: 0,
     };
 
-    constructor(id: string, props?: Partial<Props>) {
+    constructor(id: string, props?: Partial<ExtractStateType<Button>>) {
         super({
-            animation: {
-                ease: 'power4.out',
-                duration: 0.2,
+            objectName: 'button',
+
+            state: {
+                animation: DEFAULT_ANIMATION,
+                color: DEFAULT_COLOR,
+                reduceFactor: DEFAULT_REDUCE_FACTOR,
+
+                ...props,
             },
-            color: [255, 255, 255],
-            reduceFactor: 1.1,
+            pickBy: (i) => i.instVars.id === id
+        });
 
-            ...props,
-        },
-            'button',
-            (i) => i.instVars.id === id
-        );
-
-        this.onChanged('text', () => this.updateText());
-        this.onChanged('color', () => this.updateColor());
+        this.state.onChanged('text', () => this.updateText());
+        this.state.onChanged('color', () => this.updateColor());
     }
 
     protected onReady() {
@@ -50,14 +57,13 @@ export default class Button extends Component<Props, 'button'> {
 
         this.updateText();
         this.updateColor();
-
+        
         useTouched(() => this.getRoot(), (type) => {
             switch (type) {
                 case 'start': { this.animateIn(); } break;
                 case 'end': {
-                    const { onClicked } = this.getState();
                     this.animateOut();
-                    onClicked?.(this);
+                    this.onClicked?.(this);
                 } break;
             }
         });
@@ -71,12 +77,12 @@ export default class Button extends Component<Props, 'button'> {
     }
 
     private updateText() {
-        const { text } = this.getState();
+        const { text } = this.state.get();
         if (text) this.getText().text = text;
     }
 
     private updateColor() {
-        const { color, animation } = this.getState();
+        const { color, animation } = this.state.get();
         if (!color) return;
 
         const root = this.getRoot();
@@ -99,7 +105,7 @@ export default class Button extends Component<Props, 'button'> {
 
     private animateIn() {
         const { width, height } = this.initialSize;
-        const { reduceFactor, animation } = this.getState();
+        const { reduceFactor, animation } = this.state.get();
 
         gsap.to(this.getRoot(), {
             width: width / reduceFactor,
@@ -113,7 +119,7 @@ export default class Button extends Component<Props, 'button'> {
 
     private animateOut() {
         const { width, height } = this.initialSize;
-        const { animation } = this.getState();
+        const { animation } = this.state.get();
 
         gsap.to(this.getRoot(), {
             width,

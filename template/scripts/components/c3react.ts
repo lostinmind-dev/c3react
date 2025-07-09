@@ -1,9 +1,9 @@
 import { Component, utils } from 'c3react';
 import gsap from 'gsap';
 
-export default class C3React extends Component<{}, 'c3react'> {
+export default class C3React extends Component<'c3react', {}> {
     constructor() { 
-        super({}, 'c3react');
+        super({ objectName: 'c3react', state: {} });
      }
 
     protected onReady() {

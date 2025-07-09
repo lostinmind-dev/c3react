@@ -19,15 +19,14 @@ export function useChild<
     let child: I | undefined;
 
     return () => {
-        if (typeof instance === 'function') {
-            children = instance().allChildren().filter((i) =>
-                i.objectType.name === objectName
-            ).toArray() as I[];
-        } else {
-            children = instance.allChildren().filter((i) =>
-                i.objectType.name === objectName
-            ).toArray() as I[];
-        }
+        const initial = typeof instance === 'function'
+            ? instance()
+            : instance
+            ;
+
+        children = initial.allChildren().filter((i) =>
+            i.objectType.name === objectName
+        ).toArray() as I[];
 
         if (pickBy) {
             child = children.find((i) => pickBy(i));
@@ -57,15 +56,14 @@ export function useChildren<
     let children: I[] = [];
 
     return () => {
-        if (typeof instance === 'function') {
-            children = instance().allChildren().filter((i) =>
-                i.objectType.name === objectName
-            ).toArray() as I[];
-        } else {
-            children = instance.allChildren().filter((i) =>
-                i.objectType.name === objectName
-            ).toArray() as I[];
-        }
+        const initial = typeof instance === 'function'
+            ? instance()
+            : instance
+            ;
+
+        children = initial.allChildren().filter((i) =>
+            i.objectType.name === objectName
+        ).toArray() as I[];
 
         if (pickBy) {
             children = children.filter((i) => pickBy(i));

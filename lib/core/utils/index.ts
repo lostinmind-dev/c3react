@@ -1,4 +1,4 @@
-import type { ExtractObjectInstType } from '../component.ts';
+import type { ExtractInstanceType } from '../component.ts';
 import { mouse } from '../inputs/mouse.ts';
 import { pointer } from '../inputs/pointer.ts';
 
@@ -42,7 +42,11 @@ export function distance(x1: number, y1: number, x2: number, y2: number) {
     return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
 }
 
-type CreateObjectOpts = {
+export function isInPreview() {
+    return runtime.platformInfo.exportType === 'preview';
+}
+
+type CreateObjectOpts<I extends { instVars: Record<string, any> }> = {
     layerName: string,
     x: number,
     y: number,
@@ -51,11 +55,12 @@ type CreateObjectOpts = {
     height: number,
     opacity: number,
     angle: number,
+    instVars?: Partial<I['instVars']>,
 }
 
 export function createObject<N extends keyof IConstructProjectObjects>(
     name: N,
-    opts?: Partial<CreateObjectOpts>
+    opts?: Partial<CreateObjectOpts<ExtractInstanceType<N>>>
 ) {
     const object = runtime.objects[name];
 
@@ -65,21 +70,25 @@ export function createObject<N extends keyof IConstructProjectObjects>(
         opts?.y || 0,
         (opts?.templateName) ? true : false,
         opts?.templateName
-    ) as ExtractObjectInstType<N>;
+    ) as ExtractInstanceType<N>;
 
     if (typeof opts?.width !== 'undefined') instance.width = opts.width;
     if (typeof opts?.height !== 'undefined') instance.height = opts.height;
     if (typeof opts?.opacity !== 'undefined') instance.opacity = opts.opacity;
     if (typeof opts?.angle !== 'undefined') instance.angleDegrees = opts.angle;
-
+    if ('instVars' in instance && typeof opts?.instVars === 'object') {
+        for (const name in opts.instVars) {
+            instance.instVars[name] = opts.instVars[name];
+        }
+    } 
     return instance;
 }
 
 export function createObjects<N extends keyof IConstructProjectObjects>(
     name: N,
-    ...objects: Partial<CreateObjectOpts>[]
+    ...objects: Partial<CreateObjectOpts<ExtractInstanceType<N>>>[]
 ) {
-    const instances: ExtractObjectInstType<N>[] = [];
+    const instances: ExtractInstanceType<N>[] = [];
 
     for (const opts of objects) {
         instances.push(createObject(name, opts));
