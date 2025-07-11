@@ -52,6 +52,10 @@ scripts/
 # 🚀 Quickstart
 
 - **Install [Deno (JavaScript runtime)](https://docs.deno.com/runtime/)**
+- **Install [C3React CLI Tool]**
+```bash
+deno install -f -A -g -n jsr:@lostinmind/c3react/cli
+```
 - **Open C3 Template project in VSCode** `./template/`
 - **Install dependencies**
 

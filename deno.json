@@ -1,6 +1,8 @@
 {
-    "nodeModulesDir": "manual",
+    "nodeModulesDir": "auto",
     "name": "@lostinmind/c3react",
+    "version": "1.0.1",
+    "license": "MIT",
     "compilerOptions": {
         "noImplicitOverride": false,
         "lib": [
@@ -11,7 +13,8 @@
         ]
     },
     "tasks": {
-        "install:cli": "deno install -f -A -g -n c3react ./lib/cli.ts",
+        "publish": "deno publish --no-check --allow-slow-types --allow-dirty",
+        "install:cli": "deno install -f -A -g -n c3react ./cli.ts",
         "bundle:tsdefs": {
             "command": "deno run -A utils/bundle-tsdefs.ts",
             "description": "Bundles C3 declaration files into one 'c3.d.ts' file"
@@ -19,7 +22,13 @@
     },
     "exports": {
         ".": "./lib/core.ts",
-        "./cli": "./lib/cli.ts"
+        "./types": "./lib/types/c3.d.ts",
+        "./cli": "./cli.ts"
+    },
+    "publish": {
+        "exclude": [
+            "template"
+        ]
     },
     "fmt": {
         "singleQuote": true,

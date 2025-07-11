@@ -4,9 +4,6 @@
     "version": "1.0.0",
     "compilerOptions": {
         "noImplicitOverride": false,
-        "types": [
-            "./ts-defs.d.ts"
-        ],
         "lib": [
             "deno.ns",
             "dom",
@@ -26,6 +23,7 @@
     },
     "fmt": {
         "singleQuote": true,
-        "indentWidth": 4
+        "indentWidth": 4,
+        "lineWidth": 120
     }
 }

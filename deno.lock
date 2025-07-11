@@ -5,10 +5,13 @@
     "jsr:@std/path@*": "1.1.0",
     "npm:@types/node@*": "22.15.15",
     "npm:chalk@*": "5.4.1",
+    "npm:chalk@5.4.1": "5.4.1",
     "npm:v@*": "0.3.0",
     "npm:vi@*": "1.0.0",
     "npm:vit@*": "0.0.1",
-    "npm:vite@*": "6.3.5_@types+node@22.15.15_picomatch@4.0.2"
+    "npm:vite@*": "6.3.5_@types+node@22.15.15_picomatch@4.0.2",
+    "npm:vite@7.0": "7.0.4_@types+node@22.15.15_picomatch@4.0.2",
+    "npm:vite@7.0.4": "7.0.4_@types+node@22.15.15_picomatch@4.0.2"
   },
   "jsr": {
     "@std/cli@1.0.20": {
@@ -329,6 +332,15 @@
         "picomatch"
       ]
     },
+    "fdir@6.4.6_picomatch@4.0.2": {
+      "integrity": "sha512-hiFoqpyZcfNm1yc4u8oWCf9A2c4D3QjCrks3zmoVKVxpQRzmPNar1hUJcBG2RQHvEVGDN+Jm81ZheVLAQMK6+w==",
+      "dependencies": [
+        "picomatch"
+      ],
+      "optionalPeers": [
+        "picomatch"
+      ]
+    },
     "file-uri-to-path@1.0.0": {
       "integrity": "sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw=="
     },
@@ -364,6 +376,14 @@
     },
     "postcss@8.5.4": {
       "integrity": "sha512-QSa9EBe+uwlGTFmHsPKokv3B/oEMQZxfqW0QqNCyhpa6mB1afzulwn8hihglqAb2pOw+BJgNlmXQ8la2VeHB7w==",
+      "dependencies": [
+        "nanoid",
+        "picocolors",
+        "source-map-js"
+      ]
+    },
+    "postcss@8.5.6": {
+      "integrity": "sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==",
       "dependencies": [
         "nanoid",
         "picocolors",
@@ -450,7 +470,7 @@
     "tinyglobby@0.2.14_picomatch@4.0.2": {
       "integrity": "sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==",
       "dependencies": [
-        "fdir",
+        "fdir@6.4.5_picomatch@4.0.2",
         "picomatch"
       ]
     },
@@ -484,9 +504,28 @@
       "dependencies": [
         "@types/node",
         "esbuild",
-        "fdir",
+        "fdir@6.4.5_picomatch@4.0.2",
         "picomatch",
-        "postcss",
+        "postcss@8.5.4",
+        "rollup",
+        "tinyglobby"
+      ],
+      "optionalDependencies": [
+        "fsevents"
+      ],
+      "optionalPeers": [
+        "@types/node"
+      ],
+      "bin": true
+    },
+    "vite@7.0.4_@types+node@22.15.15_picomatch@4.0.2": {
+      "integrity": "sha512-SkaSguuS7nnmV7mfJ8l81JGBFV7Gvzp8IzgE8A8t23+AxuNX61Q5H1Tpz5efduSN7NHC8nQXD3sKQKZAu5mNEA==",
+      "dependencies": [
+        "@types/node",
+        "esbuild",
+        "fdir@6.4.6_picomatch@4.0.2",
+        "picomatch",
+        "postcss@8.5.6",
         "rollup",
         "tinyglobby"
       ],

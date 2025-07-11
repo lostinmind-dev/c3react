@@ -1,5 +1,6 @@
 import type { Component } from '../core.ts';
 
+
 declare global {
     namespace C3React {
         namespace Mouse {
@@ -7,19 +8,19 @@ declare global {
                 left: 0,
                 middle: 1,
                 right: 2,
-
+    
                 fourth: 3,
                 fifth: 4,
             };
             type ButtonState = 'up' | 'down' | 'pressed';
             type WheelDirection = 'up' | 'down';
         }
-
+    
         namespace Keyboard {
             type KeyState = 'up' | 'down' | 'pressed';
             type Side = 'Left' | 'Right';
             type Direction = 'Up' | 'Left' | 'Right' | 'Down';
-
+    
             type TwoSides = [
                 'Bracket',
                 'Control',
@@ -55,7 +56,7 @@ declare global {
                 'n',
                 'm',
             ];
-
+    
             type Keys =
                 & {
                     Enter: never;
@@ -73,14 +74,14 @@ declare global {
                     Slash: never;
                     Space: never;
                     CapsLock: never;
-
+    
                     /** Numpad */
                     NumpadMultiply: never;
                     NumpadSubtract: never;
                     NumpadAdd: never;
                     NumpadDecimal: never;
                     NumLock: never;
-
+    
                     PrintScreen: never;
                     Pause: never;
                     Home: never;
@@ -122,16 +123,16 @@ declare global {
                 & {
                     [Key in `Page${'Up' | 'Down'}`]: never;
                 };
-
+    
             type Key = keyof Keys | `Key${Uppercase<Chars[number]>}`;
         }
-
+    
         type Position = { x: number; y: number };
         type Size = { width: number; height: number };
     }
-
+    
     const runtime: IRuntime;
-
+    
     interface Window {
         c3react: {
             getComponents(): Component<any, any>[];
