@@ -17,7 +17,8 @@
         "build": "deno run -A ../lib/cli.ts build"
     },
     "imports": {
-        "c3react": "../mod.ts",
+        "c3react": "../lib/core.ts",
+        "c3react/components": "../lib/components.ts",
 
         "@/": "./scripts/"
     },

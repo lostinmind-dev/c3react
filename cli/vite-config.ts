@@ -2,7 +2,7 @@ import { defineConfig } from 'npm:vite@7.0.4';
 import { resolve } from 'node:path';
 
 export function createConfig(prod?: true) {
-    const c3reactPath = resolve(import.meta.dirname || '', '../lib/core.ts');
+    const c3reactPath = resolve(import.meta.dirname || '', '../lib');
 
     return defineConfig({
         build: {
@@ -34,7 +34,9 @@ export function createConfig(prod?: true) {
         },
         resolve: {
             alias: {
-                'c3react': resolve(Deno.cwd(), c3reactPath),
+                'c3react/components': resolve(Deno.cwd(), c3reactPath, 'components.ts'),
+                'c3react': resolve(Deno.cwd(), c3reactPath, 'core.ts'),
+
                 '@': resolve(Deno.cwd(), 'scripts'),
                 '@project': resolve(Deno.cwd(), 'project', 'files'),
             },

@@ -13,8 +13,8 @@ scripting
 
 ## Usage
 
-- **[💪 Advantages](#-advantages)**
-- **[🚀 Quickstart](#-quickstart)**
+- **[`💪 Advantages`](#-advantages)**
+- **[`🚀 Quickstart`](#-quickstart)**
 - **[`🚀 "C3React" Template project`](#-c3react-template-project)**
 
 # 💪 Advantages
@@ -77,21 +77,24 @@ _Template is using GSAP tool for small beautiful animations (NPM module)_
 _main.ts_
 
 ```typescript
-import app, { pointer } from 'c3react';
+import app from 'c3react';
+
+/** You can use NPM modules! */
 import gsap from 'gsap';
 
-import mainLayout from '@/layouts/main.layout.ts';
-
-pointer.init();
+import Main from '@/layouts/main.layout.ts';
 
 app.init({
+    /** Enter types of inputs that your app's using */
+    inputs: ['pointer', 'mouse', 'keyboard'],
     layouts: [
-        /** Initialize layouts here... */
-        mainLayout,
+        /** Import your layouts here... */
+        Main,
     ],
     beforeStart: async () => {
-        /** Do someting it's like runOnStartup() inside block  */
-        console.log('Before start!');
+        /** Do something it's like runOnStartup() inside block  */
+        /** Also here you already can use global 'runtime' variable */
+        console.log('Before start!', runtime);
     },
 });
 

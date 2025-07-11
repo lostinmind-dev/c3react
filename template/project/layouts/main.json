@@ -71,10 +71,8 @@
 					},
 					"uid": 3,
 					"sid": 595096666629399,
-					"tags": "",
-					"instanceVariables": {
-						"id": "rotate"
-					},
+					"tags": "rotate",
+					"instanceVariables": {},
 					"behaviors": {},
 					"sceneGraphData": {
 						"parent-uid": 9,
@@ -246,10 +244,8 @@
 					},
 					"uid": 5,
 					"sid": 112279985876910,
-					"tags": "",
-					"instanceVariables": {
-						"id": "resize"
-					},
+					"tags": "resize",
+					"instanceVariables": {},
 					"behaviors": {},
 					"sceneGraphData": {
 						"parent-uid": 9,
@@ -421,10 +417,8 @@
 					},
 					"uid": 7,
 					"sid": 784697194751025,
-					"tags": "",
-					"instanceVariables": {
-						"id": "restart"
-					},
+					"tags": "restart",
+					"instanceVariables": {},
 					"behaviors": {},
 					"sceneGraphData": {
 						"parent-uid": null,
@@ -728,10 +722,8 @@
 					},
 					"uid": 10,
 					"sid": 692402165087630,
-					"tags": "",
-					"instanceVariables": {
-						"id": "set-position"
-					},
+					"tags": "move",
+					"instanceVariables": {},
 					"behaviors": {},
 					"sceneGraphData": {
 						"parent-uid": 9,

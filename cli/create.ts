@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+import denoJson from '../deno.json' with { type: 'json' }
 
 const layoutMainTsContent = `
 import { Layout } from 'c3react';
@@ -52,11 +53,12 @@ export async function create() {
     await Deno.writeTextFile(join(root, 'deno.json'), JSON.stringify({
         nodeModulesDir: 'manual',
         name: '@c3react/template',
-        version: '1.0.0',
+        version: denoJson.version,
         compilerOptions: {
             noImplicitOverride: false,
             types: [
-                './ts-defs.d.ts',
+                'c3react/types',
+                'https://raw.githubusercontent.com/lostinmind-dev/c3react/refs/heads/main/lib/types/c3react.d.ts'
             ],
             lib: [
                 'deno.ns',
@@ -71,8 +73,11 @@ export async function create() {
             build: 'c3react build',
         },
         imports: {
-            'c3react': 'file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/lib/core.ts',
             '@/': './scripts/',
+
+            // 'c3react': `jsr:@lostinmind/c3react@^${denoJson.version}`,
+            'c3react': 'file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/lib/core.ts',
+            // 'c3react/components': 'file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/lib/components.ts',
             '@project/': './project/files/',
         },
         fmt: {

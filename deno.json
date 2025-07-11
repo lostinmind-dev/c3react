@@ -21,7 +21,9 @@
         }
     },
     "exports": {
-        ".": "./lib/core.ts",
+        "./": "./lib/core.ts",
+        "./components/": "./lib/components.ts",
+
         "./types": "./lib/types/c3.d.ts",
         "./cli": "./cli.ts"
     },

@@ -6,6 +6,7 @@
     "npm:@types/node@*": "22.15.15",
     "npm:chalk@*": "5.4.1",
     "npm:chalk@5.4.1": "5.4.1",
+    "npm:gsap@^3.13.0": "3.13.0",
     "npm:v@*": "0.3.0",
     "npm:vi@*": "1.0.0",
     "npm:vit@*": "0.0.1",
@@ -349,6 +350,9 @@
       "os": ["darwin"],
       "scripts": true
     },
+    "gsap@3.13.0": {
+      "integrity": "sha512-QL7MJ2WMjm1PHWsoFrAQH/J8wUeqZvMtHO58qdekHpCfhvhSL4gSiz6vJf5EeMP0LOn3ZCprL2ki/gjED8ghVw=="
+    },
     "inherits@2.0.4": {
       "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ=="
     },
@@ -543,6 +547,13 @@
         "async-limiter",
         "safe-buffer@5.1.2",
         "ultron"
+      ]
+    }
+  },
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:gsap@^3.13.0"
       ]
     }
   }
