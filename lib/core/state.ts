@@ -12,6 +12,10 @@ type StateValue =
 ;
 export type StateType = Record<string, StateValue>;
 
+export type ExtractStateType<S> = S extends State<
+    infer D extends StateType
+> ? D : never;
+
 export class State<S extends StateType> {
     private readonly initialValue: S;
     private value: S;
@@ -30,6 +34,7 @@ export class State<S extends StateType> {
 
     reset() {
         this.value = structuredClone(this.initialValue);
+        return this;
     }
 
     change<K extends keyof S>(key: K, value: S[K] | ((prev: S[K]) => S[K])) {
@@ -49,6 +54,8 @@ export class State<S extends StateType> {
                 if (event.once) event.unsubscribe();
             }
         }
+
+        return this;
     }
 
     set(value: S | ((prevValue: S) => S)) {
@@ -58,6 +65,8 @@ export class State<S extends StateType> {
             ;
 
         this.value = next;
+
+        return this;
     }
 
     get(): S;

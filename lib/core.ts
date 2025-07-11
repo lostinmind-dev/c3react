@@ -6,18 +6,22 @@ export { pointer } from './core/inputs/pointer.ts';
 export { keyboard } from './core/inputs/keyboard.ts';
 export { mouse } from './core/inputs/mouse.ts';
 
-export { app } from './core/app.ts';
+import { app } from './core/app.ts';
 export { Layout } from './core/layout.ts';
 export { 
     Component, 
     type ExtractInstanceType,
-    type ExtractStateType,
+    type ExtractStateType as ExtractComponentStateType,
 } from './core/component.ts';
-export { State } from './core/state.ts';
+export { 
+    State,
+    type ExtractStateType as ExtractStateType,
+    type StateType as StateDataType,
+} from './core/state.ts';
 
 /** Utils */
 export { EventsHandler } from './core/utils/events-handler.ts';
-export * as utils from './core/utils/index.ts';
+export * as utils from './core/utils.ts';
 
 /** Hooks */
 export { useLayout } from './core/hooks/use-layout.ts';
@@ -29,3 +33,7 @@ export { useEffect } from './core/hooks/use-effect.ts';
 
 export { useTouched } from './core/hooks/use-touched.ts';
 export { useMouseOver } from './core/hooks/use-mouse-over.ts';
+
+export { useInterval } from './core/hooks/use-interval.ts';
+
+export default app;

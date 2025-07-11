@@ -1,5 +1,5 @@
 import { mouse } from '../inputs/mouse.ts';
-import { isMouseOver } from '../utils/index.ts';
+import { isMouseOver } from '../utils.ts';
 
 export function useMouseOver<I extends IWorldInstance>(
     instance: I | (() => I),

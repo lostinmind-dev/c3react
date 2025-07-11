@@ -1,6 +1,6 @@
 
 import { pointer } from '../inputs/pointer.ts';
-import { isPointerOver } from '../utils/index.ts';
+import { isPointerOver } from '../utils.ts';
 
 export function useTouched<I extends IWorldInstance>(
     instance: I | (() => I),

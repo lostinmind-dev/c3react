@@ -9,17 +9,6 @@ export type ExtractInstanceType<N extends keyof IConstructProjectObjects> =
         >
     >;
 
-export type ExtractComponentGeneric<C, T extends 'objectName' | 'state'> = C extends Component<
-    infer N extends keyof IConstructProjectObjects,
-    infer S extends StateType
-> 
-    ? T extends 'objectName'
-    ? N
-    : T extends 'state'
-    ? S
-    : never : never
-;
-
 export type ExtractObjectName<C> = C extends Component<
     infer N extends keyof IConstructProjectObjects,
     infer S extends StateType

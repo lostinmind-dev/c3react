@@ -1,6 +1,6 @@
-import type { ExtractInstanceType } from '../component.ts';
-import { mouse } from '../inputs/mouse.ts';
-import { pointer } from '../inputs/pointer.ts';
+import type { ExtractInstanceType } from './component.ts';
+import { mouse } from './inputs/mouse.ts';
+import { pointer } from './inputs/pointer.ts';
 
 export function wait(seconds: number) {
     return new Promise<void>((resolve) => setTimeout(() => resolve(), seconds * 1000));
@@ -9,6 +9,21 @@ export function wait(seconds: number) {
 export function choose(...numbers: number[]) {
     const index = Math.floor(Math.random() * numbers.length);
     return numbers[index];
+}
+
+export function hexToRgb(hex: {} & string | `#${string}`): Vec3Arr {
+    // Удаляем символ '#' если он есть
+    const sanitized = hex.startsWith('#') ? hex.slice(1) : hex;
+
+    if (sanitized.length !== 6) {
+        throw new Error('Invalid hex color format. Expected format is RRGGBB or #RRGGBB.');
+    }
+
+    const r = parseInt(sanitized.slice(0, 2), 16);
+    const g = parseInt(sanitized.slice(2, 4), 16);
+    const b = parseInt(sanitized.slice(4, 6), 16);
+
+    return [r, g, b];
 }
 
 export function rgbToVec3(rgb: Vec3Arr) {

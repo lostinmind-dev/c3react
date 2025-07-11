@@ -143,3 +143,6 @@
 /// <reference path="../../utils/ts-defs/runtime/ITimelineStateBase.d.ts" />
 /// <reference path="../../utils/ts-defs/runtime/ITweenState.d.ts" />
 /// <reference path="../../utils/ts-defs/runtime/IWorldInstance.d.ts" />
+
+
+export {}

@@ -1,5 +1,5 @@
 import { type Component, components, type ExtractObjectName, type ExtractStateType } from '../component.ts';
-import { createObject } from '../utils/index.ts';
+import { createObject } from '../utils.ts';
 
 export function useComponent<T extends Component<any, any>>(
     componentClass: new (...args: any[]) => T

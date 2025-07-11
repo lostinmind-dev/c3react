@@ -1,5 +1,10 @@
 import { app } from '../app.ts';
-import { EventsHandler } from '../utils/events-handler.ts';
+import { EventsHandler, type Event } from '../utils/events-handler.ts';
+
+interface IC3ReactKeyboardEvent extends Event {
+    type: 'down' | 'up',
+    key: C3React.Keyboard.Key,
+}
 
 export class C3ReactKeyboard extends EventsHandler<{
     'down': KeyboardEvent;
@@ -11,31 +16,23 @@ export class C3ReactKeyboard extends EventsHandler<{
         if (this.isInited) return;
 
         app.on('keydown', (e) => {
-            keyboard.emit('down', e);
-
+            
             const previousState = keyboard.keys.get(e.code);
-
+            
             if (previousState !== 'down') {
                 keyboard.keys.set(e.code, 'down');
-
-                const handlers = keyboard.pressListeners.get(e.code);
-
-                if (!handlers) return;
-
-                handlers.forEach(handler => handler());
+                
             }
+
+            keyboard.notifyListeners((event) => event.type === 'down' && event.key === e.code);
+            keyboard.emit('down', e);
         });
 
         app.on('keyup', (e) => {
-            keyboard.emit('up', e);
-
             keyboard.keys.set(e.code, 'up');
 
-            const handlers = keyboard.releaseListeners.get(e.code);
-
-            if (!handlers) return;
-
-            handlers.forEach(handler => handler());
+            keyboard.notifyListeners((event) => event.type === 'up' && event.key === e.code);
+            keyboard.emit('up', e);
         });
 
         app.on('tick', () => keyboard.update());
@@ -47,8 +44,22 @@ export class C3ReactKeyboard extends EventsHandler<{
     private readonly keys = new Map<string, C3React.Keyboard.KeyState>();
     private previousKeys = new Map<string, C3React.Keyboard.KeyState>();
     
-    private readonly pressListeners = new Map<string, Set<() => void>>();
-    private readonly releaseListeners = new Map<string, Set<() => void>>();
+    private readonly listeners = new Set<IC3ReactKeyboardEvent>();
+
+    private notifyListeners(filter?: (event: IC3ReactKeyboardEvent) => boolean) {
+        let events = this.listeners;
+
+        if (filter) {
+            //@ts-ignore;
+            const filteredEvents = Array.from(this.listeners).filter(event => filter(event));
+            events = new Set(filteredEvents);
+        }
+
+        for (const event of events) {
+            event.handler({});
+            if (event.once) event.unsubscribe();
+        }
+    }
 
     private update() {
         this.previousKeys = new Map(this.keys);
@@ -60,26 +71,40 @@ export class C3ReactKeyboard extends EventsHandler<{
         });
     }
 
-    onPressed(key: C3React.Keyboard.Key, handler: () => void) {
-        let handlers = this.pressListeners.get(key);
-
-        if (!handlers) {
-            this.pressListeners.set(key, new Set());
-            handlers = this.pressListeners.get(key)!;
+    onPressed(key: C3React.Keyboard.Key, handler: () => void, opts?: Partial<{ once: boolean }>) {
+        const unsubscribe = () => {
+            this.listeners.delete(event);
         }
 
-        handlers.add(handler);
+        const event: IC3ReactKeyboardEvent = {
+            type: 'down',
+            handler,
+            unsubscribe,
+            once: opts?.once || false,
+            key,
+        }
+
+        this.listeners.add(event);
+
+        return { unsubscribe };
     }
 
-    onReleased(key: C3React.Keyboard.Key, handler: () => void) {
-        let handlers = this.releaseListeners.get(key);
-
-        if (!handlers) {
-            this.releaseListeners.set(key, new Set());
-            handlers = this.releaseListeners.get(key)!;
+    onReleased(key: C3React.Keyboard.Key, handler: () => void, opts?: Partial<{ once: boolean }>) {
+        const unsubscribe = () => {
+            this.listeners.delete(event);
         }
 
-        handlers.add(handler);
+        const event: IC3ReactKeyboardEvent = {
+            type: 'up',
+            handler,
+            unsubscribe,
+            once: opts?.once || false,
+            key,
+        }
+
+        this.listeners.add(event);
+
+        return { unsubscribe };
     }
 
     isPressed(key: C3React.Keyboard.Key) {
@@ -90,10 +115,9 @@ export class C3ReactKeyboard extends EventsHandler<{
         return this.keys.get(key) === 'up';
     }
 
-    protected override release() {
+    protected removeAllListeners() {
         super.release();
-        this.pressListeners.clear();
-        this.releaseListeners.clear();
+        this.listeners.clear();
     }
 }
 
