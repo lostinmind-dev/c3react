@@ -1,4 +1,4 @@
-import { app } from './app.ts';
+import type { App } from './app.ts';
 import { StateType } from './state.ts';
 import { Collection } from './utils/collection.ts';
 
@@ -7,7 +7,7 @@ export const layouts = new Collection<Layout>();
 export abstract class Layout {
     private static initsCount: number = 0;
 
-    static init() {
+    static init(app: App<any>) {
         if (this.initsCount > 0) return;
 
         app.on('beforeprojectstart', () => {
@@ -45,5 +45,3 @@ export abstract class Layout {
     protected beforeEnd() { }
     protected onEnd() { }
 }
-
-Layout.init();

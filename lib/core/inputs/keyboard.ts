@@ -1,4 +1,4 @@
-import { app } from '../app.ts';
+import type { App } from '../app.ts';
 import { EventsHandler, type Event } from '../utils/events-handler.ts';
 
 interface IC3ReactKeyboardEvent extends Event {
@@ -12,7 +12,7 @@ export class C3ReactKeyboard extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(keyboard: C3ReactKeyboard) {
+    static init(app: App<any>, keyboard: C3ReactKeyboard) {
         if (this.isInited) return;
 
         app.on('keydown', (e) => {

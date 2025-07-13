@@ -133,11 +133,11 @@ declare global {
     
     const runtime: IRuntime;
     
-    interface Window {
-        c3react: {
-            getComponents(): Component<any, any>[];
-        }
-    }
+    // interface Window {
+    //     c3react: {
+    //         getComponents(): Component<any, any>[];
+    //     }
+    // }
 }
 
 export {};

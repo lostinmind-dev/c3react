@@ -1,5 +1,5 @@
 import type { CoordinatesType } from './pointer.ts';
-import { app } from '../app.ts';
+import type { App } from '../app.ts';
 import { EventsHandler, type Event } from '../utils/events-handler.ts';
 
 interface IC3ReactMouseEvent extends Event {
@@ -40,7 +40,7 @@ export class C3ReactMouse extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(mouse: C3ReactMouse) {
+    static init(app: App<any>, mouse: C3ReactMouse) {
         if (this.isInited) return;
 
         app.on('mousedown', (e) => {

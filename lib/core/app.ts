@@ -1,14 +1,16 @@
 import type { Event, Handler } from './utils/events-handler.ts';
-import type { Layout } from './layout.ts';
+import { Layout } from './layout.ts';
 import { C3ReactKeyboard, keyboard } from './inputs/keyboard.ts';
 import { C3ReactMouse, mouse } from './inputs/mouse.ts';
 import { C3ReactPointer, pointer } from './inputs/pointer.ts';
+import { State, type StateType } from './state.ts';
+import { Component } from './component.ts';
 
 interface IAppEvent extends Event {
     cached: boolean,
 }
 
-class App {
+export class App<S extends StateType> {
     private isInited: boolean = false;
 
     private readonly listeners = new Map<keyof RuntimeEventMap, Set<IAppEvent>>();
@@ -24,12 +26,26 @@ class App {
         }
     }
 
+    readonly state: State<S>;
+
+    constructor(initialState: S | (() => S)) {
+        const initial = typeof initialState === 'function'
+            ? initialState()
+            : initialState
+        ;
+
+        this.state = new State(initial);
+    }
+
     init(opts: {
         inputs?: ('keyboard' | 'mouse' | 'pointer')[],
         layouts: (new () => Layout)[], //| readonly Layout[],
         beforeStart: () => void | Promise<void>,
     }) {
         if (this.isInited) return;
+
+        Component.init(this);
+        Layout.init(this);
 
         for (const layout of opts.layouts) {
             new layout();
@@ -38,9 +54,9 @@ class App {
         if (opts?.inputs) {
             const inputs = new Set(opts.inputs);
 
-            if (inputs.has('keyboard')) C3ReactKeyboard.init(keyboard);
-            if (inputs.has('mouse')) C3ReactMouse.init(mouse);
-            if (inputs.has('pointer')) C3ReactPointer.init(pointer);
+            if (inputs.has('keyboard')) C3ReactKeyboard.init(this, keyboard);
+            if (inputs.has('mouse')) C3ReactMouse.init(this, mouse);
+            if (inputs.has('pointer')) C3ReactPointer.init(this, pointer);
         }
 
         this.on('afteranylayoutend', () => {
@@ -106,9 +122,6 @@ class App {
     }
 }
 
-export const app = new App();
-
-
-window['c3react'] = {
-    getComponents: () => { return [] }
-};
+// window['c3react'] = {
+//     getComponents: () => { return [] }
+// };

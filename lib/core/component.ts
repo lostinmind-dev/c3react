@@ -1,4 +1,4 @@
-import { app } from './app.ts';
+import type { App } from './app.ts';
 import { Collection } from './utils/collection.ts';
 import { State, type StateType } from './state.ts';
 
@@ -48,7 +48,7 @@ export const components = new Collection<Component<any, any>>();
 export abstract class Component<N extends keyof IConstructProjectObjects, S extends Record<string, any>> {
     private static initsCount: number = 0;
 
-    static init() {
+    static init(app: App<any>) {
         if (this.initsCount > 0) return;
 
         app.on('instancecreate', ({ instance }) => {
@@ -180,8 +180,6 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
     }
 }
 
-Component.init();
-
-window.c3react['getComponents'] = () => {
-    return [...components.toArray()];
-}
+// window.c3react['getComponents'] = () => {
+//     return [...components.toArray()];
+// }

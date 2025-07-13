@@ -1,4 +1,4 @@
-import { app } from '../app.ts';
+import type { App } from '../app.ts';
 import { type Event, EventsHandler } from '../utils/events-handler.ts';
 
 export type CoordinatesType = 'start' | 'current' | 'previous' | 'end';
@@ -15,7 +15,7 @@ export class C3ReactPointer extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(pointer: C3ReactPointer) {
+    static init(app: App<any>, pointer: C3ReactPointer) {
         if (this.isInited) return;
 
         app.on('pointerdown', (e) => {
