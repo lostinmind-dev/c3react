@@ -23,18 +23,22 @@ function getObject<N extends keyof IConstructProjectObjects>(
     name: N,
     pickBy?: (inst: ExtractInstanceType<N>) => boolean,
 ) {
-    const object = runtime.objects[name];
-    let instance: ExtractInstanceType<N> | undefined;
+    try {
+        const object = runtime.objects[name];
+        let instance: ExtractInstanceType<N> | undefined;
 
-    if (pickBy) {
-        instance = object.instances().find((i) => pickBy(i));
+        if (pickBy) {
+            instance = object.getAllInstances().find((i) => pickBy(i));
+
+            return instance;
+        }
+
+        instance = object.getFirstInstance() || undefined;
 
         return instance;
+    } catch (e) {
+        alert(e);
     }
-
-    instance = object.getFirstInstance() || undefined;
-
-    return instance;
 }
 
 export const components = new Collection<Component<any, any>>();
@@ -52,7 +56,7 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
         if (this.initsCount > 0) return;
 
         app.on('instancecreate', ({ instance }) => {
-            // console.log('INSTANCE READY UID:', instance.uid)
+            console.log('INSTANCE READY UID:', instance.uid)
             const filteredComponents = components.toArray().filter((c) =>
                 c.opts.objectName === instance.objectType.name
             );
@@ -76,7 +80,7 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
 
         //@ts-ignore;
         app.on('hierarchyready', ({ instance }) => {
-            // console.log('HIERARCHY READY UID:', instance.uid, instance)
+            console.log('HIERARCHY READY UID:', instance.uid, instance)
             const filteredComponents = components.toArray().filter((c) =>
                 c.root && c.root.uid === instance.uid
             );
