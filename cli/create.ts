@@ -68,16 +68,16 @@ export async function create() {
             ],
         },
         tasks: {
-            bundledts: 'c3react bundledts',
             dev: 'c3react dev',
             build: 'c3react build',
         },
         imports: {
-            '@/': './scripts/',
-
             // 'c3react': `jsr:@lostinmind/c3react@^${denoJson.version}`,
             'c3react': 'file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/lib/core.ts',
+            "c3react/cli": "file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/cli.ts",
             // 'c3react/components': 'file:C:/Users/llost/OneDrive/Documents/GitHub/@lostinmind/c3react/lib/components.ts',
+
+            '@/': './scripts/',
             '@project/': './project/files/',
         },
         fmt: {

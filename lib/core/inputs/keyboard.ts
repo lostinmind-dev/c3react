@@ -12,7 +12,7 @@ export class C3ReactKeyboard extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(app: App<any>, keyboard: C3ReactKeyboard) {
+    static init(app: App<any>) {
         if (this.isInited) return;
 
         app.on('keydown', (e) => {

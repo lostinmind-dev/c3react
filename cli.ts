@@ -46,7 +46,7 @@ async function main() {
     }
 
     if (args._.includes('dev')) {
-        return await build(true);
+        return await build({ isDev: true });
     }
 
     if (args._.includes('create')) {
@@ -57,3 +57,5 @@ async function main() {
 }
 
 await main();
+
+export type { IConfig } from './cli/config.ts';

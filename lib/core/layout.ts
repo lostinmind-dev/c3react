@@ -1,8 +1,6 @@
 import type { App } from './app.ts';
-import { StateType } from './state.ts';
-import { Collection } from './utils/collection.ts';
 
-export const layouts = new Collection<Layout>();
+export const layouts = new Map<string, Layout>();
 
 export abstract class Layout {
     private static initsCount: number = 0;
@@ -10,8 +8,28 @@ export abstract class Layout {
     static init(app: App<any>) {
         if (this.initsCount > 0) return;
 
-        app.on('beforeprojectstart', () => {
-            layouts.toArray().forEach(layout => layout.setRoot(runtime.getLayout(layout.name)));
+        app.on('beforeanylayoutstart', (e) => {
+            const layout = layouts.get(e.layout.name);
+            if (!layout) return;
+            layout.beforeStart();
+        });
+
+        app.on('afteranylayoutstart', (e) => {
+            const layout = layouts.get(e.layout.name);
+            if (!layout) return;
+            layout.onStart();
+        });
+
+        app.on('beforeanylayoutend', (e) => {
+            const layout = layouts.get(e.layout.name);
+            if (!layout) return;
+            layout.beforeEnd();
+        });
+
+        app.on('afteranylayoutend', (e) => {
+            const layout = layouts.get(e.layout.name);
+            if (!layout) return;
+            layout.onEnd();
         });
 
         this.initsCount++;
@@ -20,24 +38,13 @@ export abstract class Layout {
     private root?: IAnyProjectLayout;
 
     constructor(private readonly name: string) {
-        layouts.add(this);
+        layouts.set(name, this);
     }
 
     protected getRoot() {
         if (!this.root) throw new Error('Layout was NOT defined yet');
 
         return this.root;
-    }
-
-    private setRoot(layout: IAnyProjectLayout) {
-        if (this.root) throw new Error(`Can't set ROOT layout, it was already defined before!`);
-
-        layout.addEventListener('beforelayoutstart', () => this.beforeStart());
-        layout.addEventListener('afterlayoutstart', () => this.onStart());
-        layout.addEventListener('beforelayoutend', () => this.beforeEnd());
-        layout.addEventListener('afterlayoutend', () => this.onEnd());
-
-        this.root = layout;
     }
 
     protected beforeStart() { }

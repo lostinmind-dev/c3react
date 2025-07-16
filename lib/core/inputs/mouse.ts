@@ -40,7 +40,7 @@ export class C3ReactMouse extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(app: App<any>, mouse: C3ReactMouse) {
+    static init(app: App<any>) {
         if (this.isInited) return;
 
         app.on('mousedown', (e) => {

@@ -18,7 +18,7 @@ export type ExtractStateType<S> = S extends State<
 
 export class State<S extends StateType> {
     private readonly initialValue: S;
-    private value: S;
+    #value: S;
 
     private readonly listeners = new Map<keyof S, Set<OnChangedEvent<any>>>();
 
@@ -29,21 +29,21 @@ export class State<S extends StateType> {
             ;
 
         this.initialValue = structuredClone(initial);
-        this.value = structuredClone(initial);
+        this.#value = structuredClone(initial);
     }
 
     reset() {
-        this.value = structuredClone(this.initialValue);
+        this.#value = structuredClone(this.initialValue);
         return this;
     }
 
     change<K extends keyof S>(key: K, value: S[K] | ((prev: S[K]) => S[K])) {
-        const prev = this.value[key];
+        const prev = this.#value[key];
         const next = typeof value === 'function'
             ? (value as (prev: S[K]) => S[K])(prev)
             : value;
 
-        this.value[key] = next;
+        this.#value[key] = next;
 
         const events = this.listeners.get(key);
 
@@ -60,11 +60,11 @@ export class State<S extends StateType> {
 
     set(value: S | ((prevValue: S) => S)) {
         const next = typeof value === 'function'
-            ? value(this.value)
+            ? value(this.#value)
             : value
             ;
 
-        this.value = next;
+        this.#value = next;
 
         return this;
     }
@@ -72,7 +72,7 @@ export class State<S extends StateType> {
     get(): S;
     get<K extends keyof S>(key: K): S[K];
     get<K extends keyof S>(key?: K): S | S[K] {
-        const state = this.value;
+        const state = this.#value;
         return (typeof key === 'undefined') ? state : state[key];
     }
 

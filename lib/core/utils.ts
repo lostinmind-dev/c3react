@@ -2,6 +2,8 @@ import type { ExtractInstanceType } from './component.ts';
 import { mouse } from './inputs/mouse.ts';
 import { pointer } from './inputs/pointer.ts';
 
+type HexColor = {} & string | `#${string}`;
+
 export function wait(seconds: number) {
     return new Promise<void>((resolve) => setTimeout(() => resolve(), seconds * 1000));
 }
@@ -11,7 +13,7 @@ export function choose(...numbers: number[]) {
     return numbers[index];
 }
 
-export function hexToRgb(hex: {} & string | `#${string}`): Vec3Arr {
+export function hexToRgb(hex: HexColor): Vec3Arr {
     // Удаляем символ '#' если он есть
     const sanitized = hex.startsWith('#') ? hex.slice(1) : hex;
 
@@ -28,6 +30,11 @@ export function hexToRgb(hex: {} & string | `#${string}`): Vec3Arr {
 
 export function rgbToVec3(rgb: Vec3Arr) {
     return [rgb[0] / 255, rgb[1] / 255, rgb[2] / 255] as Vec3Arr satisfies Vec3Arr;
+}
+
+export function hexToVec3(hex: HexColor) {
+    const rgb = hexToRgb(hex);
+    return rgbToVec3(rgb);
 }
 
 export function lerp(a: number, b: number, c: number) {
@@ -146,7 +153,7 @@ export function isPointerOver(instance: IWorldInstance) {
         instance.getBoundingBox(),
         translatedX,
         translatedY,
-    );
+    )
 }
 
 export async function addScript(url: string, opts?: {

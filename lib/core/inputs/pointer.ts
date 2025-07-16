@@ -15,7 +15,7 @@ export class C3ReactPointer extends EventsHandler<{
 }> {
     private static isInited: boolean = false;
 
-    static init(app: App<any>, pointer: C3ReactPointer) {
+    static init(app: App<any>) {
         if (this.isInited) return;
 
         app.on('pointerdown', (e) => {
@@ -24,6 +24,11 @@ export class C3ReactPointer extends EventsHandler<{
             pointer.coordinates.set('start', {
                 x: e.clientX,
                 y: e.clientY
+            });
+
+            pointer.coordinates.set('current', {
+                x: e.clientX,
+                y: e.clientY,
             });
 
             pointer.notifyListeners((event) => event.type === 'down');
@@ -57,10 +62,17 @@ export class C3ReactPointer extends EventsHandler<{
 
         app.on('pointerup', (e) => {
             pointer.#isTouching = false;
+
+            pointer.coordinates.set('current', {
+                x: e.clientX,
+                y: e.clientY,
+            });
+            
             pointer.coordinates.set('end', {
                 x: e.clientX,
                 y: e.clientY,
             });
+            
 
             pointer.notifyListeners((event) => event.type === 'up');
             pointer.emit('up', e);

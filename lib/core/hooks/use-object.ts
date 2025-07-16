@@ -10,7 +10,7 @@ export function useObject<N extends keyof IConstructProjectObjects>(
 
     if (pickBy) {
         //@ts-ignore;
-        instance = object.instances().find((i) => pickBy(i));
+        instance = object.getAllInstances().find((i) => pickBy(i));
 
         if (!instance) {
             throw new Error(
@@ -38,9 +38,9 @@ export function useObjects<N extends keyof IConstructProjectObjects>(
     const object = runtime.objects[name];
 
     //@ts-ignore;
-    instances = object.instances().filter((i) =>
+    instances = object.getAllInstances().filter((i) =>
         i.objectType.name === name
-    ).toArray();
+    );
 
     if (pickBy) {
         instances = instances.filter((i) => pickBy(i));

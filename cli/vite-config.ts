@@ -1,14 +1,14 @@
 import { defineConfig } from 'npm:vite@7.0.4';
 import { resolve } from 'node:path';
 
-export function createConfig(prod?: true) {
+export function createConfig(opts?: Partial<{ isDev: boolean }>) {
     const c3reactPath = resolve(import.meta.dirname || '', '../lib');
 
     return defineConfig({
         build: {
-            watch: (prod) ? {} : null,
-            minify: (prod) ? 'esbuild' : false,
-            sourcemap: (prod) ? 'inline' : false,
+            watch: (opts?.isDev === true) ? {} : null,
+            minify: (opts?.isDev === true) ? false : 'esbuild',
+            sourcemap: (opts?.isDev === true) ? 'inline' : false,
             emptyOutDir: false,
             outDir: 'project/scripts',
             target: 'es2022',
@@ -22,15 +22,6 @@ export function createConfig(prod?: true) {
                 },
                 treeshake: true,
             },
-            // terserOptions: (prod) ? {
-            //     compress: {
-            //         drop_console: true,
-            //         drop_debugger: true,
-            //     },
-            //     format: {
-            //         comments: false,
-            //     },
-            // } : undefined,
         },
         resolve: {
             alias: {

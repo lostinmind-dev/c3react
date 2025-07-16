@@ -1,8 +1,8 @@
 import type { Event, Handler } from './utils/events-handler.ts';
 import { Layout } from './layout.ts';
-import { C3ReactKeyboard, keyboard } from './inputs/keyboard.ts';
-import { C3ReactMouse, mouse } from './inputs/mouse.ts';
-import { C3ReactPointer, pointer } from './inputs/pointer.ts';
+import { C3ReactKeyboard } from './inputs/keyboard.ts';
+import { C3ReactMouse } from './inputs/mouse.ts';
+import { C3ReactPointer } from './inputs/pointer.ts';
 import { State, type StateType } from './state.ts';
 import { Component } from './component.ts';
 
@@ -11,9 +11,31 @@ interface IAppEvent extends Event {
 }
 
 export class App<S extends StateType> {
+    public static instance: App<any>;
+
     private isInited: boolean = false;
 
     private readonly listeners = new Map<keyof RuntimeEventMap, Set<IAppEvent>>();
+    private readonly layouts: Layout[] = [];
+    readonly state: State<S>;
+
+    constructor(initialState: S | (() => S)) {
+        App.instance = this;
+
+        const initial = typeof initialState === 'function'
+            ? initialState()
+            : initialState
+            ;
+
+        this.state = new State(initial);
+
+        Layout.init(this);
+        Component.init(this);
+        
+        C3ReactKeyboard.init(this);
+        C3ReactMouse.init(this);
+        C3ReactPointer.init(this);
+    }
 
     private addRuntimeEventListener(eventName: keyof RuntimeEventMap, event: IAppEvent) {
         if (event.once) {
@@ -26,37 +48,15 @@ export class App<S extends StateType> {
         }
     }
 
-    readonly state: State<S>;
-
-    constructor(initialState: S | (() => S)) {
-        const initial = typeof initialState === 'function'
-            ? initialState()
-            : initialState
-        ;
-
-        this.state = new State(initial);
-    }
 
     init(opts: {
-        inputs?: ('keyboard' | 'mouse' | 'pointer')[],
         layouts: (new () => Layout)[], //| readonly Layout[],
-        beforeStart: () => void | Promise<void>,
+        beforeStart?: () => void | Promise<void>,
     }) {
         if (this.isInited) return;
 
-        Component.init(this);
-        Layout.init(this);
-
         for (const layout of opts.layouts) {
-            new layout();
-        }
-
-        if (opts?.inputs) {
-            const inputs = new Set(opts.inputs);
-
-            if (inputs.has('keyboard')) C3ReactKeyboard.init(this, keyboard);
-            if (inputs.has('mouse')) C3ReactMouse.init(this, mouse);
-            if (inputs.has('pointer')) C3ReactPointer.init(this, pointer);
+            this.layouts.push(new layout());
         }
 
         this.on('afteranylayoutend', () => {
@@ -65,10 +65,10 @@ export class App<S extends StateType> {
                 .toArray()
                 .map(handlers => handlers.values().toArray())
                 .flat()
-                .filter(handler => handler.cached)
+                .filter(handler => handler.cached === true)
                 ;
 
-                cachedEvents.forEach(event => event.unsubscribe())
+            cachedEvents.forEach(event => event.unsubscribe())
         });
 
         runOnStartup(async (runtime) => {
@@ -76,7 +76,6 @@ export class App<S extends StateType> {
 
             //@ts-ignore @GLOBAL
             globalThis.runtime = runtime;
-
 
             for (const [eventName, events] of this.listeners) {
                 events.forEach(event => this.addRuntimeEventListener(eventName, event));

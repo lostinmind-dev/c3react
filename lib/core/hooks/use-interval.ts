@@ -1,3 +1,4 @@
+import { App } from '../app.ts';
 import { EventsHandler, type Handler } from '../utils/events-handler.ts';
 
 class Interval extends EventsHandler<{
@@ -39,10 +40,11 @@ class Interval extends EventsHandler<{
 
 const intervals = new Set<Interval>();
 
-export function useInterval(seconds: number, handler: Handler<number>, opts?: Partial<{ iterations: number }>) {
+export function useInterval(seconds: number, handler: Handler<number>, opts?: Partial<{ iterations: number, cached: boolean }>) {
     const interval = new Interval(seconds, handler, opts?.iterations);
 
     const clear = () => {
+        stop();
         intervals.delete(interval);
     }
 
@@ -57,6 +59,12 @@ export function useInterval(seconds: number, handler: Handler<number>, opts?: Pa
     interval.on('end', () => clear())
 
     intervals.add(interval);
+
+    if (opts?.cached === true) {
+        const app = App.instance;
+
+        app.on('afteranylayoutend', () => clear(), { once: true });
+    }
 
     return { clear, stop, resume };
 }
