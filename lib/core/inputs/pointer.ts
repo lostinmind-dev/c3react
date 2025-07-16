@@ -67,7 +67,7 @@ export class C3ReactPointer extends EventsHandler<{
                 x: e.clientX,
                 y: e.clientY,
             });
-            
+
             pointer.coordinates.set('end', {
                 x: e.clientX,
                 y: e.clientY,

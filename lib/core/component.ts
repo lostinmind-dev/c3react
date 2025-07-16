@@ -54,14 +54,15 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
         app.on('instancecreate', ({ instance }) => {
             // console.log('INSTANCE READY UID:', instance.uid)
             const filteredComponents = components.toArray().filter((c) =>
-                c.objectName === instance.objectType.name
+                c.opts.objectName === instance.objectType.name
             );
 
             let component: Component<any, any>;
             for (component of filteredComponents) {
+                const { opts } = component;
                 const pickedInstance = getObject(
-                    component.objectName,
-                    component.pickBy,
+                    opts.objectName,
+                    opts.pickBy,
                 );
 
                 if (instance !== pickedInstance) continue;
@@ -89,7 +90,7 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
                 component.#isDestroyed = true;
                 component.onDestroyed();
                 // component.root = undefined;
-                if (component.isCached) {
+                if (component.opts.cached === true) {
                     component.state.removeAllListeners();
                     components.delete(component);
                 };
@@ -97,15 +98,13 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
         });
 
         app.on('afteranylayoutend', () => {
-            const cachedComponents = components.toArray().filter(c => c.isCached);
+            const cachedComponents = components.toArray().filter(c => c.opts.cached === true);
             cachedComponents.forEach(c => components.delete(c));
         });
 
         this.initsCount++;
     }
 
-    private readonly objectName?: N;
-    private readonly pickBy?: (inst: ExtractInstanceType<N>) => boolean;
     private root?: ExtractInstanceType<N>;
 
     readonly state: State<S>;
@@ -120,24 +119,20 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
         return typeof this.root !== 'undefined';
     }
 
-    /**
-     * Cached components will be deleted from global collection after any layout end
-     */
-    protected isCached: boolean = false;
 
-    constructor(opts: {
-        objectName?: N,
+    constructor(private readonly opts: {
+        objectName: N,
         state: S | (() => S),
+        
+        /** Cached components will be deleted from global collection after any layout end */
+        cached?: true,
         pickBy?: (inst: ExtractInstanceType<N>) => boolean,
     }) {
-        this.objectName = opts.objectName;
-        this.pickBy = opts.pickBy;
-
         this.state = new State(opts.state);
         components.add(this);
 
-        if (typeof runtime !== 'undefined' && this.objectName) {
-            const root = getObject(this.objectName, this.pickBy);
+        if (typeof runtime !== 'undefined' && opts.objectName) {
+            const root = getObject(opts.objectName, opts.pickBy);
 
             if (root) {
                 this.root = root;
@@ -179,7 +174,3 @@ export abstract class Component<N extends keyof IConstructProjectObjects, S exte
         this.root.destroy();
     }
 }
-
-// window.c3react['getComponents'] = () => {
-//     return [...components.toArray()];
-// }

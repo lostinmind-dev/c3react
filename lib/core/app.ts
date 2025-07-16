@@ -31,10 +31,6 @@ export class App<S extends StateType> {
 
         Layout.init(this);
         Component.init(this);
-        
-        C3ReactKeyboard.init(this);
-        C3ReactMouse.init(this);
-        C3ReactPointer.init(this);
     }
 
     private addRuntimeEventListener(eventName: keyof RuntimeEventMap, event: IAppEvent) {
@@ -48,7 +44,6 @@ export class App<S extends StateType> {
         }
     }
 
-
     init(opts: {
         layouts: (new () => Layout)[], //| readonly Layout[],
         beforeStart?: () => void | Promise<void>,
@@ -58,6 +53,10 @@ export class App<S extends StateType> {
         for (const layout of opts.layouts) {
             this.layouts.push(new layout());
         }
+
+        C3ReactKeyboard.init(this);
+        C3ReactMouse.init(this);
+        C3ReactPointer.init(this);
 
         this.on('afteranylayoutend', () => {
             const cachedEvents = this.listeners
@@ -121,6 +120,6 @@ export class App<S extends StateType> {
     }
 }
 
-// window['c3react'] = {
-//     getComponents: () => { return [] }
-// };
+window['c3react'] = {
+    getComponents: () => { return [] }
+};
